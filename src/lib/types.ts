@@ -42,6 +42,8 @@ export interface Dish {
   category: string | null
   note: string | null
   recipe_id: string | null
+  /** Crowned by the host as a winner of the gathering */
+  is_winner: boolean
   owner_user_id: string
   created_at: string
   updated_at: string
@@ -58,7 +60,7 @@ export type EventSummary = Event & {
 
 export type RecipeEventRef = Pick<Event, "id" | "title" | "slug" | "starts_at">
 export type RecipeWithEvents = Recipe & {
-  dishes: { id: string; event_id: string; events: RecipeEventRef | null }[]
+  dishes: { id: string; event_id: string; is_winner: boolean; events: RecipeEventRef | null }[]
 }
 
 export interface RecipeInput {

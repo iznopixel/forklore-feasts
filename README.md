@@ -45,4 +45,6 @@ To protect guest sign-in from bots, create a Cloudflare Turnstile widget, put it
 - `supabase/seed.sql` adds a few example events (admin-run, bypasses RLS).
 - **Hosts:** run `supabase/hosts.sql` once. Anyone can go to `/host`, sign in with an emailed link (Auth → Email must be enabled; add your site URL + `/host` to Auth → URL Configuration redirect URLs) and request host access. Requests land as `pending`; approve with `update public.hosts set status = 'approved' where email = '...';` (list pending ones with `select * from public.hosts where status = 'pending'`). Approved hosts can create, edit and delete their own gatherings, including a cover photo. Guests stay anonymous and can't touch events.
 
+- **Winners:** run `supabase/winners.sql` once (after `hosts.sql`). Hosts then see a “Crown a winner” button on each dish at their own gatherings; crowned dishes get a crown on their recipe cards, sort first on the event page, and can be filtered with the “Winners” chip on `/recipes`.
+
 Layout: `src/app` (routes + API), `src/server` (Supabase helpers), `src/views` (page UIs), `src/components/cookbook` (poster, cards, ornaments), `src/components/ui` (shadcn).

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { MagnifyingGlassIcon, PlusIcon, XIcon } from "@phosphor-icons/react"
-import { Annotation, SectionHeader } from "@/components/cookbook/ornaments"
+import { Annotation, Crown, SectionHeader } from "@/components/cookbook/ornaments"
 import { RecipeCard } from "@/components/cookbook/recipe-card"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -15,7 +15,7 @@ import { categoryIcon } from "@/lib/taxonomy"
 import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
 
-const KEYS = ["q", "category", "tag", "contributor", "event"] as const
+const KEYS = ["q", "category", "tag", "contributor", "event", "winner"] as const
 
 export default function RecipesPage() {
   const params = useSearchParams()
@@ -30,6 +30,7 @@ export default function RecipesPage() {
   const tag = params.get("tag") ?? ""
   const contributor = params.get("contributor") ?? ""
   const eventId = params.get("event") ?? ""
+  const winnersOnly = params.get("winner") === "1"
 
   const [draft, setDraft] = useState(q)
   useEffect(() => setDraft(q), [q])
@@ -53,8 +54,8 @@ export default function RecipesPage() {
   const facets = useAsync(fetchRecipeFacets, [])
   const events = useAsync(fetchEvents, [])
   const recipes = useAsync(
-    () => fetchRecipes({ search: q, category, tag, contributor, eventId }),
-    [q, category, tag, contributor, eventId]
+    () => fetchRecipes({ search: q, category, tag, contributor, eventId, winnersOnly }),
+    [q, category, tag, contributor, eventId, winnersOnly]
   )
 
   const activeCount = KEYS.filter((k) => params.get(k)).length
@@ -99,7 +100,10 @@ export default function RecipesPage() {
         </div>
 
         {facets.data && facets.data.categories.length > 0 && (
-          <div role="group" aria-label="Dish type" className="flex flex-wrap gap-2">
+          <div role="group" aria-label="Dish type and winners" className="flex flex-wrap gap-2">
+            <Chip active={winnersOnly} onClick={() => setParam("winner", winnersOnly ? "" : "1")}>
+              <Crown className="size-4" /> Winners
+            </Chip>
             <Chip active={!category} onClick={() => setParam("category", "")}>All dishes</Chip>
             {facets.data.categories.map((c) => {
               const Icon = categoryIcon(c)

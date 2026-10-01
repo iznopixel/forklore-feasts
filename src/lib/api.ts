@@ -81,6 +81,10 @@ export const updateDish = async (
   await call(`/api/dishes/${id}`, { method: "PATCH", json: patch })
 }
 
+export const setDishWinner = async (id: string, winner: boolean) => {
+  await call(`/api/dishes/${id}/winner`, { method: "PUT", json: { winner } })
+}
+
 export const deleteDish = async (id: string) => {
   await call(`/api/dishes/${id}`, { method: "DELETE" })
 }
@@ -96,6 +100,7 @@ export interface RecipeFilters {
   tag?: string
   contributor?: string
   eventId?: string
+  winnersOnly?: boolean
 }
 
 export function fetchRecipes(filters: RecipeFilters = {}, limit?: number) {
@@ -105,6 +110,7 @@ export function fetchRecipes(filters: RecipeFilters = {}, limit?: number) {
   if (filters.tag) p.set("tag", filters.tag)
   if (filters.contributor) p.set("contributor", filters.contributor)
   if (filters.eventId) p.set("event", filters.eventId)
+  if (filters.winnersOnly) p.set("winner", "1")
   if (limit) p.set("limit", String(limit))
   return call<RecipeWithEvents[]>(`/api/recipes?${p}`)
 }

@@ -29,3 +29,7 @@ export function minutesLabel(min?: number | null) {
 export function distinctRecipeCount(dishes: { recipe_id: string | null }[]) {
   return new Set(dishes.map((d) => d.recipe_id).filter(Boolean)).size
 }
+
+/** True when any dish made from this recipe was crowned at a gathering. */
+export const isWinningRecipe = (recipe: { dishes?: { is_winner?: boolean }[] }) =>
+  !!recipe.dishes?.some((d) => d.is_winner)
