@@ -142,7 +142,7 @@ export default function RecipeDetailPage() {
 
         <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,17rem)_1fr] md:gap-14">
           <section aria-labelledby="ingredients">
-            <h2 id="ingredients" className="font-heading text-3xl font-bold">Ingredients</h2>
+            <h2 id="ingredients" className="mb-4 font-heading text-3xl font-bold">Ingredients</h2>
             {recipe.ingredients.length > 0 ? (
               <ul className="space-y-2.5">
                 {recipe.ingredients.map((ing, i) => (
@@ -158,7 +158,7 @@ export default function RecipeDetailPage() {
           </section>
 
           <section aria-labelledby="method">
-            <h2 id="method" className="font-heading text-3xl font-bold">Method</h2>
+            <h2 id="method" className="mb-4 font-heading text-3xl font-bold">Method</h2>
             {recipe.instructions.length > 0 ? (
               <ol className="space-y-5">
                 {recipe.instructions.map((step, i) => (
