@@ -24,18 +24,18 @@ export default function HomePage() {
   return (
     <>
       {/* Hero: the illustration holds the table on the left; the empty parchment on the right carries the title */}
-      <section className="relative overflow-hidden border-b-[3px] border-double border-foreground/70 bg-[#f4e6c8] text-[#2c3025]">
+      <section className="relative overflow-hidden border-b-[3px] border-double border-foreground/70 bg-[#f1dbb5] text-[#2c3025]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero-feast.webp"
-          alt="An autumn potluck table: a pot of stew, a lattice-topped pie, crusty bread, pears and apples, with candles and wildflowers"
+          alt="A block-print illustration of a potluck table: a pot of stew, a lattice-topped pie, crusty bread, pears in a basket and a wedge of cheese on a checked cloth"
           width={1672}
           height={941}
           fetchPriority="high"
-          className="aspect-[4/3] w-full object-cover object-[18%_100%] sm:aspect-[16/9] lg:aspect-[16/9]"
+          className="aspect-[16/11] w-full object-cover object-[25%_100%] sm:aspect-[16/9] lg:aspect-[16/9]"
         />
         <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:absolute lg:inset-0 lg:max-w-none lg:p-0">
-          <div className="lg:absolute lg:top-[4.5%] lg:right-[4%] lg:left-[49%]">
+          <div className="lg:absolute lg:top-[4.5%] lg:right-[4%] lg:left-[50%]">
             <Annotation className="mb-5 block text-[1.6rem] lg:mb-[1.2vw] lg:text-[2vw]" rotate={-3}>
               ~ a neighborhood potluck cookbook ~
             </Annotation>
