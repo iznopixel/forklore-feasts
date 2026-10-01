@@ -9,6 +9,7 @@ import {
   ForkKnifeIcon,
   ListIcon,
   PlusIcon,
+  UserCircleIcon,
   HouseLineIcon,
 } from "@phosphor-icons/react"
 import { Annotation, Flourish, Sparkle } from "@/components/cookbook/ornaments"
@@ -22,6 +23,7 @@ const NAV = [
   { to: "/", label: "Home", icon: HouseLineIcon, end: true },
   { to: "/events", label: "Gatherings", icon: CalendarBlankIcon, end: false },
   { to: "/recipes", label: "Recipes", icon: BookOpenTextIcon, end: false },
+  { to: "/host", label: "Hosts", icon: UserCircleIcon, end: false },
 ]
 
 

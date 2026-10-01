@@ -73,3 +73,13 @@ export async function readJson<T = Record<string, unknown>>(req: Request): Promi
     throw new ApiError(400, "Request body must be JSON.")
   }
 }
+
+/** Like requireUser, but the caller must be a signed-in (non-guest) approved host. */
+export async function requireHost(req: Request, sb: SupabaseClient) {
+  const user = await requireUser(req, sb)
+  if (user.is_anonymous) throw new ApiError(403, "Sign in as a host to manage gatherings.")
+  const { data, error } = await sb.rpc("is_host")
+  if (error) throw new ApiError(500, error.message)
+  if (data !== true) throw new ApiError(403, "This account isn’t set up as a host yet.")
+  return user
+}

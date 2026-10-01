@@ -6,6 +6,7 @@ export interface Event {
   description: string | null
   starts_at: string
   cover_image_path: string | null
+  host_user_id: string | null
   created_at: string
   updated_at: string
 }
@@ -81,4 +82,13 @@ export interface DishInput {
   category: string | null
   note: string | null
   recipe_id?: string | null
+}
+
+export interface EventInput {
+  title: string
+  theme: string | null
+  description: string | null
+  /** ISO timestamp */
+  starts_at: string
+  cover_image_path?: string | null
 }

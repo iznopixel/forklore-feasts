@@ -2,6 +2,8 @@ import { supabase } from "@/lib/supabase"
 import type {
   Dish,
   DishInput,
+  Event,
+  EventInput,
   EventSummary,
   EventWithDishes,
   Recipe,
@@ -47,6 +49,18 @@ export const fetchEventBySlug = async (slug: string) => {
     event.dishes = [...(event.dishes ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at))
   }
   return event
+}
+
+export const fetchHostStatus = () => call<{ isHost: boolean }>("/api/host/me")
+
+export const createEvent = (input: EventInput) =>
+  call<Event>("/api/events", { method: "POST", json: input })
+
+export const updateEvent = (id: string, input: EventInput) =>
+  call<Event>(`/api/events/${id}`, { method: "PATCH", json: input })
+
+export const deleteEvent = async (id: string) => {
+  await call(`/api/events/${id}`, { method: "DELETE" })
 }
 
 /* ------------------------------ Dishes ------------------------------ */
