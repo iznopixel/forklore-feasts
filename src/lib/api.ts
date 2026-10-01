@@ -51,7 +51,12 @@ export const fetchEventBySlug = async (slug: string) => {
   return event
 }
 
-export const fetchHostStatus = () => call<{ isHost: boolean }>("/api/host/me")
+export type HostStatus = "none" | "pending" | "approved"
+
+export const fetchHostStatus = () => call<{ status: HostStatus; isHost: boolean }>("/api/host/me")
+
+export const requestHostAccess = (name: string) =>
+  call<{ status: HostStatus; isHost: boolean }>("/api/host/me", { method: "POST", json: { name } })
 
 export const createEvent = (input: EventInput) =>
   call<Event>("/api/events", { method: "POST", json: input })

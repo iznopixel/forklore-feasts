@@ -9,7 +9,7 @@ import { SectionHeader } from "@/components/cookbook/ornaments"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { deleteEvent, fetchEvents, fetchHostStatus } from "@/lib/api"
+import { deleteEvent, fetchEvents, fetchHostStatus, requestHostAccess } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import { shortDate, timeOfDay } from "@/lib/format"
 import { useAsync } from "@/lib/use-async"
@@ -24,7 +24,7 @@ function SignInCard() {
   async function onSubmit(ev: FormEvent) {
     ev.preventDefault()
     const value = email.trim().toLowerCase()
-    if (!/^\S+@\S+\.\S+$/.test(value)) return setError("Enter the email address you were invited with.")
+    if (!/^\S+@\S+\.\S+$/.test(value)) return setError("Enter your email address.")
     setError(null)
     setSending(true)
     try {
@@ -54,7 +54,7 @@ function SignInCard() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="index-card mx-auto mt-8 grid max-w-md gap-5 p-6" style={{ backgroundImage: "none" }}>
-      <FormField id="host-email" label="Email" required error={error} hint="We’ll email you a one-time link. No password needed.">
+      <FormField id="host-email" label="Email" required error={error} hint="New here? Same step: we’ll email a one-time link, then you can request host access. No password needed.">
         <Input
           id="host-email"
           type="email"
@@ -67,6 +67,40 @@ function SignInCard() {
       <Button type="submit" disabled={sending}>
         <EnvelopeSimpleIcon weight="bold" /> {sending ? "Sending…" : "Email me a sign-in link"}
       </Button>
+    </form>
+  )
+}
+
+function RequestCard({ email, onDone }: { email: string | null; onDone: () => void }) {
+  const [name, setName] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [sending, setSending] = useState(false)
+
+  async function onSubmit(ev: FormEvent) {
+    ev.preventDefault()
+    if (!name.trim()) return setError("Tell us your name.")
+    setError(null)
+    setSending(true)
+    try {
+      await requestHostAccess(name.trim())
+      onDone()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn’t send your request.")
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} noValidate className="index-card mx-auto mt-8 grid max-w-md gap-5 p-6" style={{ backgroundImage: "none" }}>
+      <p className="font-heading text-xl font-bold">Request host access</p>
+      <p className="-mt-3 text-sm text-muted-foreground">
+        You’re signed in as {email}. An admin will review your request; once approved you can create gatherings.
+      </p>
+      <FormField id="host-name" label="Your name" required error={error}>
+        <Input id="host-name" value={name} maxLength={100} aria-invalid={Boolean(error)} onChange={(e) => setName(e.target.value)} />
+      </FormField>
+      <Button type="submit" disabled={sending}>{sending ? "Sending…" : "Request access"}</Button>
     </form>
   )
 }
@@ -135,7 +169,7 @@ function Dashboard({ userId }: { userId: string }) {
 export default function HostPage() {
   const { status, isGuest, userId, email, signOut } = useAuth()
   const signedIn = status === "ready" && !isGuest && userId
-  const host = useAsync(async () => (signedIn ? (await fetchHostStatus()).isHost : false), [signedIn, userId])
+  const host = useAsync(async () => (signedIn ? (await fetchHostStatus()).status : "none"), [signedIn, userId])
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
@@ -147,12 +181,14 @@ export default function HostPage() {
         <SignInCard />
       ) : host.error ? (
         <ErrorNote message={host.error} onRetry={host.reload} />
-      ) : !host.data ? (
+      ) : host.data === "none" ? (
+        <RequestCard email={email} onDone={host.reload} />
+      ) : host.data === "pending" ? (
         <EmptyNote
-          title="This email isn’t a host yet"
+          title="Request received"
           action={<Button variant="outline" onClick={() => void signOut()}>Sign out</Button>}
         >
-          You’re signed in as {email}, but it hasn’t been approved to host gatherings. Ask the site admin to add it.
+          Thanks! {email} is waiting for an admin’s approval. Come back to this page once you’ve been approved.
         </EmptyNote>
       ) : (
         <>

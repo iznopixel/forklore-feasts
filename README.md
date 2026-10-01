@@ -30,7 +30,7 @@ Browser ──fetch──▶ Next.js /api/* route handlers ──▶ Supabase (P
 | `POST /api/recipes`, `PATCH/DELETE /api/recipes/[id]` | auth required, owner via RLS |
 | `GET/POST /api/dishes`, `PATCH/DELETE /api/dishes/[id]` | |
 | `POST /api/events`, `PATCH/DELETE /api/events/[id]` | hosts only (see below), own events via RLS |
-| `GET /api/host/me` | `{ isHost }` for the caller |
+| `GET/POST /api/host/me` | host status (`none`/`pending`/`approved`); POST requests access |
 | `POST /api/uploads` | image → `forklore-media/<user-id>/<file>`; returns the object path |
 
 `owner_user_id` and slugs are never sent; the database fills them. Only the publishable key is used.
@@ -43,6 +43,6 @@ To protect guest sign-in from bots, create a Cloudflare Turnstile widget, put it
 
 - **Authentication → Sign In / Providers → Anonymous sign-ins must be enabled.** Until it is, the site is browsable but saving shows a friendly notice.
 - `supabase/seed.sql` adds a few example events (admin-run, bypasses RLS).
-- **Hosts:** run `supabase/hosts.sql` once. Then invite a host with `insert into public.hosts (email) values ('them@example.com');`. They go to `/host`, get an emailed sign-in link (Auth → Email must be enabled; add your site URL + `/host` to Auth → URL Configuration redirect URLs), and can create, edit and delete their own gatherings, including a cover photo. Guests stay anonymous and can't touch events.
+- **Hosts:** run `supabase/hosts.sql` once. Anyone can go to `/host`, sign in with an emailed link (Auth → Email must be enabled; add your site URL + `/host` to Auth → URL Configuration redirect URLs) and request host access. Requests land as `pending`; approve with `update public.hosts set status = 'approved' where email = '...';` (list pending ones with `select * from public.hosts where status = 'pending'`). Approved hosts can create, edit and delete their own gatherings, including a cover photo. Guests stay anonymous and can't touch events.
 
 Layout: `src/app` (routes + API), `src/server` (Supabase helpers), `src/views` (page UIs), `src/components/cookbook` (poster, cards, ornaments), `src/components/ui` (shadcn).
