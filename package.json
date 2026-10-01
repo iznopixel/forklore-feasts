@@ -14,7 +14,7 @@
     "@base-ui/react": "latest",
     "@fontsource-variable/caveat": "^5.3.0",
     "@fontsource-variable/source-sans-3": "^5.3.0",
-    "@fontsource/goblin-one": "^5.3.0",
+    "@fontsource/young-serif": "^5.3.0",
     "@phosphor-icons/react": "^2.1.10",
     "@shadcn/react": "^0.3.1",
     "@supabase/supabase-js": "^2.117.2",
