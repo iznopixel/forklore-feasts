@@ -69,6 +69,7 @@ export function sanitizeEvent(body: Raw) {
     theme: optStr(body.theme, 120),
     description: optStr(body.description, 2000),
     starts_at: starts.toISOString(),
+    is_public: body.is_public !== false,
   }
   if ("cover_image_path" in body) out.cover_image_path = optStr(body.cover_image_path, 300)
   return out

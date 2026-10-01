@@ -9,7 +9,7 @@ import { SectionHeader } from "@/components/cookbook/ornaments"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { deleteEvent, fetchEvents, fetchHostStatus, requestHostAccess } from "@/lib/api"
+import { deleteEvent, fetchMyEvents, fetchHostStatus, requestHostAccess } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import { shortDate, timeOfDay } from "@/lib/format"
 import { useAsync } from "@/lib/use-async"
@@ -106,7 +106,7 @@ function RequestCard({ email, onDone }: { email: string | null; onDone: () => vo
 }
 
 function Dashboard({ userId }: { userId: string }) {
-  const { data, error, loading, reload } = useAsync(fetchEvents, [])
+  const { data, error, loading, reload } = useAsync(fetchMyEvents, [])
   const [busy, setBusy] = useState<string | null>(null)
   const mine = (data ?? []).filter((e) => e.host_user_id === userId).sort((a, b) => b.starts_at.localeCompare(a.starts_at))
 
@@ -149,7 +149,7 @@ function Dashboard({ userId }: { userId: string }) {
               {e.title}
             </Link>
             <p className="text-sm text-muted-foreground">
-              {shortDate(e.starts_at)} · {timeOfDay(e.starts_at)} · {e.dishes?.length ?? 0} dishes
+              {shortDate(e.starts_at)} · {timeOfDay(e.starts_at)} · {e.dishes?.length ?? 0} dishes{!e.is_public && " · unlisted"}
             </p>
           </div>
           <div className="flex gap-2">

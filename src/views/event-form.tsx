@@ -34,6 +34,7 @@ export default function EventFormPage() {
   const [theme, setTheme] = useState("")
   const [description, setDescription] = useState("")
   const [startsAt, setStartsAt] = useState("")
+  const [isPublic, setIsPublic] = useState(true)
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [keepImage, setKeepImage] = useState(true)
@@ -50,6 +51,7 @@ export default function EventFormPage() {
     setTheme(e.theme ?? "")
     setDescription(e.description ?? "")
     setStartsAt(format(new Date(e.starts_at), "yyyy-MM-dd'T'HH:mm"))
+    setIsPublic(e.is_public)
   }, [existing.data])
 
   useEffect(() => {
@@ -89,6 +91,7 @@ export default function EventFormPage() {
         theme: theme.trim() || null,
         description: description.trim() || null,
         starts_at: new Date(startsAt).toISOString(),
+        is_public: isPublic,
         ...(cover_image_path !== undefined ? { cover_image_path } : {}),
       }
       const saved = editing && existing.data ? await updateEvent(existing.data.id, input) : await createEvent(input)
@@ -139,6 +142,28 @@ export default function EventFormPage() {
           <FormField id="ef-desc" label="Description">
             <Textarea id="ef-desc" rows={5} value={description} maxLength={2000} onChange={(e) => setDescription(e.target.value)} />
           </FormField>
+
+          <fieldset className="grid gap-2">
+            <legend className="mb-1 text-[0.8rem] font-bold tracking-[0.1em] uppercase">Event visibility</legend>
+            {[
+              { value: true, label: "Public", hint: "Listed on Forklore Feasts" },
+              { value: false, label: "Private / Unlisted", hint: "Only people with the link can find this event" },
+            ].map((o) => (
+              <label key={String(o.value)} className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="radio"
+                  name="ef-visibility"
+                  className="mt-1.5 accent-tomato"
+                  checked={isPublic === o.value}
+                  onChange={() => setIsPublic(o.value)}
+                />
+                <span>
+                  <span className="block font-semibold">{o.label}</span>
+                  <span className="block text-sm text-muted-foreground">{o.hint}</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
 
           <div className="grid gap-2">
             <p className="text-[0.8rem] font-bold tracking-[0.1em] uppercase">

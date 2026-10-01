@@ -43,6 +43,8 @@ async function callOrNull<T>(path: string): Promise<T | null> {
 
 export const fetchEvents = () => call<EventSummary[]>("/api/events")
 
+export const fetchMyEvents = () => call<EventSummary[]>("/api/events?mine=1")
+
 export const fetchEventBySlug = async (slug: string) => {
   const event = await callOrNull<EventWithDishes>(`/api/events/${encodeURIComponent(slug)}`)
   if (event) {

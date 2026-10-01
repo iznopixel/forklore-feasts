@@ -69,6 +69,9 @@ grant execute on function public.request_host_access(text) to authenticated;
 alter table public.events
   add column if not exists host_user_id uuid default auth.uid() references auth.users (id) on delete set null;
 
+-- Unlisted events: is_public = false hides an event from listings but not from direct links.
+alter table public.events add column if not exists is_public boolean not null default true;
+
 -- 4. Hosts can create events, and edit/delete the ones they created. Reads stay as they are.
 drop policy if exists "hosts insert own events" on public.events;
 create policy "hosts insert own events" on public.events
