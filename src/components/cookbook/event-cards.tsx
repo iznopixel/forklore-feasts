@@ -59,7 +59,7 @@ export function PosterCard({
           </div>
           <h3
             className={cn(
-              "display misprint max-w-[14ch] break-words text-[clamp(2.4rem,7vw,3.4rem)]",
+              "display misprint max-w-[14ch] break-words text-[clamp(3rem,8vw,4.25rem)]",
               featured && "sm:text-[4rem]"
             )}
           >

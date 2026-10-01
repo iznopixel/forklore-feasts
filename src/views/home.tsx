@@ -32,7 +32,7 @@ export default function HomePage() {
             <Annotation className="mb-4 block text-[1.6rem]" rotate={-3}>
               ~ a neighborhood potluck cookbook ~
             </Annotation>
-            <h1 className="display text-[clamp(3.4rem,10vw,6.75rem)] text-wine">
+            <h1 className="display text-[clamp(4.25rem,13vw,9rem)] text-wine">
               Forklore
               <br />
               <span className="text-tomato">Feasts</span>

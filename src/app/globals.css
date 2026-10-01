@@ -1,5 +1,4 @@
-@import "@fontsource-variable/fraunces/full.css";
-@import "@fontsource-variable/fraunces/full-italic.css";
+@import "@fontsource/young-serif/latin-400.css";
 @import "@fontsource-variable/source-sans-3/index.css";
 @import "@fontsource-variable/caveat/index.css";
 @import "tailwindcss";
@@ -8,7 +7,9 @@
 
 @theme {
   --font-sans: "Source Sans 3 Variable", "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Fraunces Variable", "Fraunces", Georgia, serif;
+  --font-display: "Young Serif", Georgia, serif;
+  /* Small headings stay in the body face; Young Serif is reserved for large display type */
+  --font-heading: var(--font-sans);
   --font-hand: "Caveat Variable", "Caveat", cursive;
 }
 
@@ -162,8 +163,6 @@
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    letter-spacing: -0.02em;
-    font-variation-settings: "SOFT" 60, "WONK" 1;
     text-wrap: balance;
   }
   button, input, textarea, select {
@@ -184,14 +183,14 @@
     font-variation-settings: normal;
   }
 
-  /* Expressive display type: soft, wonky Fraunces at high optical size */
+  /* Theatrical vintage-poster display type (Young Serif). Large sizes only. */
   .display {
-    font-family: var(--font-heading);
-    font-weight: 800;
-    font-optical-sizing: auto;
-    font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-style: normal;
+    font-synthesis: none;
     line-height: 0.92;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.015em;
   }
   /* Slightly misregistered second print pass */
   .misprint {
