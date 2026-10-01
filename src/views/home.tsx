@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRightIcon, BookOpenTextIcon, CalendarBlankIcon, HandHeartIcon } from "@phosphor-icons/react"
+import { ArrowRightIcon, HandHeartIcon } from "@phosphor-icons/react"
 import { Annotation, Flourish, SectionHeader } from "@/components/cookbook/ornaments"
 import { PosterCard } from "@/components/cookbook/event-cards"
 import { RecipeCard } from "@/components/cookbook/recipe-card"
@@ -12,7 +12,6 @@ import { isUpcoming, longDate } from "@/lib/format"
 import { mediaUrl } from "@/lib/supabase"
 import type { EventSummary } from "@/lib/types"
 import { useAsync } from "@/lib/use-async"
-import { cn } from "@/lib/utils"
 
 /** The last evening's invitation, taped up like a snapshot. */
 function LastGatheringPhoto({ event }: { event: EventSummary }) {
@@ -64,39 +63,25 @@ export default function HomePage() {
           width={1448}
           height={1086}
           fetchPriority="high"
-          className="aspect-[4/3] w-full object-cover object-[45%_50%] sm:aspect-[16/10] lg:aspect-auto lg:h-[min(46rem,56vw)]"
+          className="aspect-[16/9] w-full object-cover object-[45%_55%] lg:aspect-auto lg:h-[min(30rem,38vw)]"
         />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(90deg,rgb(42_26_18/0.9)_0%,rgb(42_26_18/0.72)_32%,rgb(42_26_18/0.1)_62%,transparent_80%)] lg:block"
         />
-        <div className="relative mx-auto px-4 py-10 sm:px-6 lg:absolute lg:inset-0 lg:flex lg:max-w-none lg:items-center lg:p-0 lg:pl-[max(2rem,calc((100vw-72rem)/2+1.5rem))]">
+        <div className="relative mx-auto px-4 py-8 sm:px-6 lg:absolute lg:inset-0 lg:flex lg:max-w-none lg:items-center lg:p-0 lg:pl-[max(2rem,calc((100vw-72rem)/2+1.5rem))]">
           <div className="lg:max-w-[min(34rem,46vw)]">
-            <Annotation className="mb-5 block text-[1.6rem] text-[#552829] lg:mb-4 lg:text-[#f0c9a0]" rotate={-3}>
+            <Annotation className="mb-3 block text-[1.6rem] text-[#552829] lg:mb-2 lg:text-[#f0c9a0]" rotate={-3}>
               ~ come hungry, stay awhile ~
             </Annotation>
-            <h1 className="display text-[clamp(4rem,12vw,8.5rem)] text-[#2c3025] lg:text-[clamp(4.5rem,8vw,7.5rem)] lg:text-[#fbf3e3]">
+            <h1 className="display text-[clamp(3.25rem,10vw,6rem)] text-[#2c3025] lg:text-[clamp(3.5rem,6vw,5.5rem)] lg:text-[#fbf3e3]">
               Forklore
               <br />
               <span className="text-[#552829] lg:text-[#f2b9a8]">Feasts</span>
             </h1>
-            <p className="mt-5 max-w-[32ch] font-heading text-2xl leading-snug font-medium italic lg:mt-5 lg:max-w-[34ch]">
-              Gather around good food. RSVP, pull up a chair, and share the recipes worth keeping.
+            <p className="mt-4 max-w-[34ch] font-heading text-xl leading-snug font-medium italic lg:max-w-[36ch] lg:text-[1.35rem]">
+              Find a recipe worth making, sign up to bring a dish to the next gathering, or host a table of your own.
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-4">
-              <Link href="/events" className={cn(buttonVariants({ size: "lg" }), "lg:bg-[#fbf3e3] lg:text-[#2c3025] lg:hover:bg-[#fff8ea]")}>
-                <CalendarBlankIcon weight="bold" /> RSVP to a gathering
-              </Link>
-              <Link
-                href="/recipes/new"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "lg" }),
-                  "border-[#2c3025]/60 bg-[#f4eedc]/70 text-[#2c3025] hover:bg-[#f4eedc] lg:border-[#fbf3e3]/70 lg:bg-transparent lg:text-[#fbf3e3] lg:hover:bg-[#fbf3e3]/15"
-                )}
-              >
-                <BookOpenTextIcon weight="bold" /> Share a recipe
-              </Link>
-            </div>
           </div>
         </div>
       </section>
