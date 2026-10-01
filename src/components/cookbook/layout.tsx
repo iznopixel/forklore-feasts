@@ -9,7 +9,6 @@ import {
   ForkKnifeIcon,
   ListIcon,
   PlusIcon,
-  UserCircleIcon,
   HouseLineIcon,
 } from "@phosphor-icons/react"
 import { Annotation, Flourish, Sparkle } from "@/components/cookbook/ornaments"
@@ -23,7 +22,6 @@ const NAV = [
   { to: "/", label: "Home", icon: HouseLineIcon, end: true },
   { to: "/events", label: "Gatherings", icon: CalendarBlankIcon, end: false },
   { to: "/recipes", label: "Recipes", icon: BookOpenTextIcon, end: false },
-  { to: "/host", label: "Hosts", icon: UserCircleIcon, end: false },
 ]
 
 
@@ -172,6 +170,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 <Link key={to} href={to} className="hover:text-[#f0c15c]">{label}</Link>
               ))}
               <Link href="/recipes/new" className="hover:text-[#f0c15c]">Add a recipe</Link>
+              <Link href="/host" className="hover:text-[#f0c15c]">Hosts</Link>
             </nav>
           </div>
           <p className="mt-10 flex items-center gap-2 text-sm opacity-80">
