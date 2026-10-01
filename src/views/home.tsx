@@ -145,7 +145,7 @@ export default function HomePage() {
       </section>
 
       {/* Last gathering: its invitation beside the recipes that were on the table */}
-      <section className="-mb-24 border-t border-border bg-sky">
+      <section className="border-t border-border bg-sky">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <SectionHeader
             kicker="remember when…"

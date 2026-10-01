@@ -12,7 +12,7 @@ import {
   TrashIcon,
 } from "@phosphor-icons/react"
 import { DishDialog } from "@/components/cookbook/dish-dialog"
-import { Annotation, Flourish, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
+import { Annotation, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import {
   AlertDialog,
@@ -206,7 +206,6 @@ export default function EventDetailPage() {
               ))}
             </ul>
           )}
-          <Flourish className="mx-auto mt-16 max-w-xs text-tomato" />
         </section>
         </div>
       </div>

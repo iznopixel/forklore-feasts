@@ -15,7 +15,7 @@ import {
   UserIcon,
   UsersIcon,
 } from "@phosphor-icons/react"
-import { Annotation, Flourish } from "@/components/cookbook/ornaments"
+import { Annotation } from "@/components/cookbook/ornaments"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import {
   AlertDialog,
@@ -81,7 +81,7 @@ export default function RecipeDetailPage() {
   }
 
   return (
-    <article className="gingham-blue -mb-24">
+    <article className="gingham-blue">
       <div className="mx-auto max-w-5xl px-4 pt-10 pb-16 sm:px-6">
       <Link href="/recipes" className="inline-flex items-center gap-2 text-sm font-bold tracking-widest text-wine uppercase hover:underline">
         <ArrowLeftIcon weight="bold" /> All recipes
@@ -211,7 +211,6 @@ export default function RecipeDetailPage() {
           </Button>
         </div>
       )}
-      <Flourish className="mx-auto mt-14 max-w-xs text-wine" />
       </div>
 
       <AlertDialog open={confirming} onOpenChange={setConfirming}>

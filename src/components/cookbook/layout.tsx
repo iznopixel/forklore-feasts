@@ -154,7 +154,7 @@ export function Layout({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <footer className="grain relative mt-24 bg-[#6f7524] text-[#f4eedc]">
+      <footer className="grain relative bg-[#6f7524] text-[#f4eedc]">
         <div className="relative z-[1] mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <Flourish className="mb-8 text-[#f5cfc4]" />
           <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
