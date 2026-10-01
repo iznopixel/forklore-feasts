@@ -23,38 +23,45 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Hero: the illustration holds the table on the left; the empty parchment on the right carries the title */}
-      <section className="relative overflow-hidden border-b-[3px] border-double border-foreground/70 bg-[#f1dbb5] text-[#2c3025]">
+      {/* Hero: candlelit table photo; a warm scrim carries the title on desktop, stacked beneath the photo on phones */}
+      <section className="relative overflow-hidden border-b-[3px] border-double border-foreground/70 bg-[#f1e6cf] text-[#2c3025] lg:bg-[#2a1a12] lg:text-[#fbf3e3]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero-feast.webp"
-          alt="A block-print illustration of a potluck table: a pot of stew, a lattice-topped pie, crusty bread, pears in a basket and a wedge of cheese on a checked cloth"
-          width={1672}
-          height={941}
+          alt="Friends clinking wine glasses over a candlelit table of squash soup, crusty bread and a big wooden bowl of salad"
+          width={1448}
+          height={1086}
           fetchPriority="high"
-          className="aspect-[16/11] w-full object-cover object-[25%_100%] sm:aspect-[16/9] lg:aspect-[16/9]"
+          className="aspect-[4/3] w-full object-cover object-[45%_50%] sm:aspect-[16/10] lg:aspect-auto lg:h-[min(46rem,56vw)]"
         />
-        <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:absolute lg:inset-0 lg:max-w-none lg:p-0">
-          <div className="lg:absolute lg:top-[4.5%] lg:right-[4%] lg:left-[50%]">
-            <Annotation className="mb-5 block text-[1.6rem] lg:mb-[1.2vw] lg:text-[2vw]" rotate={-3}>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(90deg,rgb(42_26_18/0.9)_0%,rgb(42_26_18/0.72)_32%,rgb(42_26_18/0.1)_62%,transparent_80%)] lg:block"
+        />
+        <div className="relative mx-auto px-4 py-10 sm:px-6 lg:absolute lg:inset-0 lg:flex lg:max-w-none lg:items-center lg:p-0 lg:pl-[max(2rem,calc((100vw-72rem)/2+1.5rem))]">
+          <div className="lg:max-w-[min(34rem,46vw)]">
+            <Annotation className="mb-5 block text-[1.6rem] text-[#552829] lg:mb-4 lg:text-[#f0c9a0]" rotate={-3}>
               ~ a neighborhood potluck cookbook ~
             </Annotation>
-            <h1 className="display text-[clamp(4rem,12vw,8.5rem)] text-[#2c3025] lg:text-[6.4vw]">
+            <h1 className="display text-[clamp(4rem,12vw,8.5rem)] text-[#2c3025] lg:text-[clamp(4.5rem,8vw,7.5rem)] lg:text-[#fbf3e3]">
               Forklore
               <br />
-              <span className="text-[#552829]">Feasts</span>
-              <Sparkle className="ml-2 inline size-[0.45em] -translate-y-[0.5em] text-[#ad8b21]" />
+              <span className="text-[#552829] lg:text-[#f2b9a8]">Feasts</span>
+              <Sparkle className="ml-2 inline size-[0.45em] -translate-y-[0.5em] text-[#ad8b21] lg:text-[#e8b84f]" />
             </h1>
-            <p className="mt-5 max-w-[32ch] font-heading text-2xl leading-snug font-medium italic lg:mt-[1vw] lg:max-w-[40ch] lg:text-[1.5vw]">
+            <p className="mt-5 max-w-[32ch] font-heading text-2xl leading-snug font-medium italic lg:mt-5 lg:max-w-[34ch]">
               One long table, a dozen dishes, and every recipe written down so it never gets lost.
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-4 lg:mt-[1.3vw]">
-              <Link href="/events" className={cn(buttonVariants({ size: "lg" }))}>
+            <div className="mt-7 flex flex-wrap items-center gap-4">
+              <Link href="/events" className={cn(buttonVariants({ size: "lg" }), "lg:bg-[#fbf3e3] lg:text-[#2c3025] lg:hover:bg-[#fff8ea]")}>
                 <CalendarBlankIcon weight="bold" /> See the gatherings
               </Link>
               <Link
                 href="/recipes"
-                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-[#2c3025]/60 bg-[#f4eedc]/70 text-[#2c3025] hover:bg-[#f4eedc]")}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "border-[#2c3025]/60 bg-[#f4eedc]/70 text-[#2c3025] hover:bg-[#f4eedc] lg:border-[#fbf3e3]/70 lg:bg-transparent lg:text-[#fbf3e3] lg:hover:bg-[#fbf3e3]/15"
+                )}
               >
                 <BookOpenTextIcon weight="bold" /> Browse recipes
               </Link>
