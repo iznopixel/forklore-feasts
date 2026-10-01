@@ -1,22 +1,14 @@
+@import "@fontsource/goblin-one/latin-400.css";
 @import "@fontsource-variable/source-sans-3/index.css";
 @import "@fontsource-variable/caveat/index.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Silver Stone: self-hosted display face (drop the licensed file at public/fonts/) */
-@font-face {
-  font-family: "Silver Stone";
-  src: url("/fonts/silver-stone.woff2") format("woff2"), url("/fonts/silver-stone.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 @theme {
   --font-sans: "Source Sans 3 Variable", "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Silver Stone", Impact, "Arial Narrow Bold", "Helvetica Neue Condensed Bold", sans-serif-condensed, sans-serif;
-  /* Small headings stay in the body face; Silver Stone is reserved for large display type */
+  --font-display: "Goblin One", Impact, "Arial Narrow Bold", "Helvetica Neue Condensed Bold", sans-serif-condensed, sans-serif;
+  /* Small headings stay in the body face; Goblin One is reserved for large display type */
   --font-heading: var(--font-sans);
   --font-hand: "Caveat Variable", "Caveat", cursive;
 }
@@ -191,7 +183,7 @@
     font-variation-settings: normal;
   }
 
-  /* Tall, theatrical vintage-poster display type. Large sizes only. */
+  /* Chunky, theatrical vintage-poster display type (Goblin One). Large sizes only. */
   .display {
     font-family: var(--font-display);
     font-weight: 400;
