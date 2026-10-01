@@ -154,23 +154,23 @@ export function Layout({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <footer className="grain relative mt-24 bg-[#2c3025] text-[#f4eedc]">
+      <footer className="grain relative mt-24 bg-[#6f7524] text-[#f4eedc]">
         <div className="relative z-[1] mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <Flourish className="mb-8 text-[#e7aead]" />
+          <Flourish className="mb-8 text-[#f5cfc4]" />
           <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
             <div>
               <p className="display text-5xl text-[#f4eedc]">Come hungry.</p>
-              <p className="display text-5xl text-[#e7aead]">Bring something good.</p>
-              <Annotation className="mt-3 block text-[#d4b04a]" rotate={-2}>
+              <p className="display text-5xl text-[#f5cfc4]">Bring something good.</p>
+              <Annotation className="mt-3 block text-[#f6e6a8]" rotate={-2}>
                 good food, good company, and recipes worth keeping
               </Annotation>
             </div>
             <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2 font-heading text-lg font-semibold">
               {NAV.map(({ to, label }) => (
-                <Link key={to} href={to} className="hover:text-[#d4b04a]">{label}</Link>
+                <Link key={to} href={to} className="hover:text-[#f6e6a8]">{label}</Link>
               ))}
-              <Link href="/recipes/new" className="hover:text-[#d4b04a]">Add a recipe</Link>
-              <Link href="/host" className="hover:text-[#d4b04a]">Hosts</Link>
+              <Link href="/recipes/new" className="hover:text-[#f6e6a8]">Add a recipe</Link>
+              <Link href="/host" className="hover:text-[#f6e6a8]">Hosts</Link>
             </nav>
           </div>
           <p className="mt-10 flex items-center gap-2 text-sm opacity-80">
