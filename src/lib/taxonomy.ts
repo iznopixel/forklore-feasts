@@ -96,7 +96,7 @@ const GLYPHS: { match: RegExp; glyphs: PosterStyle["glyphs"]; scrawl: string }[]
   { match: /spring|green|garden|herb/i, glyphs: [PlantIcon, LeafIcon, StarIcon], scrawl: "fresh picked" },
 ]
 
-const FALLBACK_SCRAWL = ["come hungry!", "bring a friend", "all welcome", "one dish, many hands"]
+const FALLBACK_SCRAWL = ["come hungry!", "bring a friend", "all welcome"]
 
 function hash(s: string) {
   let h = 0
