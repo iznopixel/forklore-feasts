@@ -37,10 +37,13 @@ export function CountLine({ event, className }: { event: EventSummary; className
 export function PosterCard({
   event,
   featured = false,
+  captionless = false,
   className,
 }: {
   event: EventSummary
   featured?: boolean
+  /** Image only; the surrounding page carries the details */
+  captionless?: boolean
   className?: string
 }) {
   const d = monthDay(event.starts_at)
@@ -55,6 +58,7 @@ export function PosterCard({
           <Link href={`/events/${event.slug}`} className="block outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
             <img src={cover} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
           </Link>
+          {!captionless && (
           <figcaption className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 px-1 pt-4 pb-1">
             <div className="min-w-0">
               <p className="text-xs font-bold tracking-[0.22em] text-accent uppercase">
@@ -71,6 +75,7 @@ export function PosterCard({
               <ArrowRightIcon weight="bold" />
             </Link>
           </figcaption>
+          )}
         </figure>
       </article>
     )
