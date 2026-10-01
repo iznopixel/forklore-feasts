@@ -170,6 +170,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 <Link key={to} href={to} className="hover:text-[#d4b04a]">{label}</Link>
               ))}
               <Link href="/recipes/new" className="hover:text-[#d4b04a]">Add a recipe</Link>
+              <Link href="/host" className="hover:text-[#d4b04a]">Hosts</Link>
             </nav>
           </div>
           <p className="mt-10 flex items-center gap-2 text-sm opacity-80">

@@ -21,8 +21,15 @@ interface AuthValue {
   userId: string | null
   /** Reason guest sign-in failed, when status is "unavailable". */
   error: string | null
+  /** True for guests; false once someone has signed in with an email. */
+  isGuest: boolean
+  email: string | null
   /** Try again to get a guest session; resolves to the session if it worked. */
   ensureSession: () => Promise<Session | null>
+  /** Emails a one-time sign-in link for hosts. Throws with a readable message on failure. */
+  sendHostLink: (email: string) => Promise<void>
+  /** Signs out and drops back to a fresh guest session. */
+  signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthValue | null>(null)
@@ -71,6 +78,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return data.session
   }, [])
 
+  const sendHostLink = useCallback(async (email: string) => {
+    let captchaToken: string | undefined
+    try {
+      captchaToken = await getCaptchaToken()
+    } catch (e) {
+      throw new Error(e instanceof Error ? e.message : "Captcha check failed.")
+    }
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/host`,
+        ...(captchaToken ? { captchaToken } : {}),
+      },
+    })
+    if (otpError) throw new Error(otpError.message)
+  }, [])
+
+  const signOut = useCallback(async () => {
+    await supabase.auth.signOut()
+    setSession(null)
+    await ensureSession()
+  }, [ensureSession])
+
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next)
@@ -89,9 +119,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       userId: session?.user.id ?? null,
       error,
+      isGuest: session?.user.is_anonymous ?? true,
+      email: session?.user.email ?? null,
       ensureSession,
+      sendHostLink,
+      signOut,
     }),
-    [status, session, error, ensureSession]
+    [status, session, error, ensureSession, sendHostLink, signOut]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

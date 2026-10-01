@@ -57,3 +57,20 @@ export function sanitizeDish(body: Raw, { requireEvent }: { requireEvent: boolea
   if ("recipe_id" in body) out.recipe_id = optStr(body.recipe_id, 64)
   return out
 }
+
+/** Whitelists event fields — never trusts host_user_id/slug/id from the client. */
+export function sanitizeEvent(body: Raw) {
+  const title = str(body.title, 120)
+  if (!title) throw new ApiError(400, "Give the gathering a title.")
+  const starts = typeof body.starts_at === "string" ? new Date(body.starts_at) : null
+  if (!starts || Number.isNaN(starts.getTime())) throw new ApiError(400, "Pick a valid date and time.")
+  const out: Raw = {
+    title,
+    theme: optStr(body.theme, 120),
+    description: optStr(body.description, 2000),
+    starts_at: starts.toISOString(),
+    is_public: body.is_public !== false,
+  }
+  if ("cover_image_path" in body) out.cover_image_path = optStr(body.cover_image_path, 300)
+  return out
+}

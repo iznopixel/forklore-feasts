@@ -2,6 +2,8 @@ import { supabase } from "@/lib/supabase"
 import type {
   Dish,
   DishInput,
+  Event,
+  EventInput,
   EventSummary,
   EventWithDishes,
   Recipe,
@@ -41,12 +43,31 @@ async function callOrNull<T>(path: string): Promise<T | null> {
 
 export const fetchEvents = () => call<EventSummary[]>("/api/events")
 
+export const fetchMyEvents = () => call<EventSummary[]>("/api/events?mine=1")
+
 export const fetchEventBySlug = async (slug: string) => {
   const event = await callOrNull<EventWithDishes>(`/api/events/${encodeURIComponent(slug)}`)
   if (event) {
     event.dishes = [...(event.dishes ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at))
   }
   return event
+}
+
+export type HostStatus = "none" | "pending" | "approved"
+
+export const fetchHostStatus = () => call<{ status: HostStatus; isHost: boolean }>("/api/host/me")
+
+export const requestHostAccess = (name: string) =>
+  call<{ status: HostStatus; isHost: boolean }>("/api/host/me", { method: "POST", json: { name } })
+
+export const createEvent = (input: EventInput) =>
+  call<Event>("/api/events", { method: "POST", json: input })
+
+export const updateEvent = (id: string, input: EventInput) =>
+  call<Event>(`/api/events/${id}`, { method: "PATCH", json: input })
+
+export const deleteEvent = async (id: string) => {
+  await call(`/api/events/${id}`, { method: "DELETE" })
 }
 
 /* ------------------------------ Dishes ------------------------------ */

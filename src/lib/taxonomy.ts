@@ -117,7 +117,7 @@ export function posterStyle(event: Pick<Event, "slug" | "title" | "theme">): Pos
   ]
   return {
     ...palette,
-    glyphs: found?.glyphs ?? fallback[(h >> 3) % fallback.length],
-    scrawl: found?.scrawl ?? FALLBACK_SCRAWL[(h >> 5) % FALLBACK_SCRAWL.length],
+    glyphs: found?.glyphs ?? fallback[(h >>> 3) % fallback.length],
+    scrawl: found?.scrawl ?? FALLBACK_SCRAWL[(h >>> 5) % FALLBACK_SCRAWL.length],
   }
 }

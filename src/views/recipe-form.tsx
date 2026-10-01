@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   createDish,
   createRecipe,
+  fetchEventBySlug,
   fetchEvents,
   fetchMyDishesForEvent,
   fetchRecipeBySlug,
@@ -34,7 +35,7 @@ import { useAuth } from "@/lib/auth"
 import { longDate } from "@/lib/format"
 import { mediaUrl } from "@/lib/supabase"
 import { DIETARY_TAGS, DISH_CATEGORIES, normalizeTag } from "@/lib/taxonomy"
-import type { Dish, RecipeInput } from "@/lib/types"
+import type { Dish, EventSummary, RecipeInput } from "@/lib/types"
 import { useAsync } from "@/lib/use-async"
 import { getSavedName, saveName, useRequireUser } from "@/lib/use-writer"
 import { cn } from "@/lib/utils"
@@ -89,6 +90,7 @@ export default function RecipeFormPage() {
   const [source, setSource] = useState("")
   const [notes, setNotes] = useState("")
   const [eventId, setEventId] = useState("")
+  const [linkedEvent, setLinkedEvent] = useState<EventSummary | null>(null)
   const [dishChoice, setDishChoice] = useState(NEW_DISH)
   const [myDishes, setMyDishes] = useState<Dish[]>([])
   const [file, setFile] = useState<File | null>(null)
@@ -123,7 +125,14 @@ export default function RecipeFormPage() {
   useEffect(() => {
     if (editing || !events.data || !eventSlug) return
     const match = events.data.find((e) => e.slug === eventSlug)
-    if (match) setEventId((cur) => cur || match.id)
+    if (match) return setEventId((cur) => cur || match.id)
+    // Unlisted events aren't in the public list; fetch by slug so the link still works
+    void fetchEventBySlug(eventSlug).then((e) => {
+      if (e) {
+        setLinkedEvent(e)
+        setEventId((cur) => cur || e.id)
+      }
+    })
   }, [editing, events.data, eventSlug])
 
   // Which of my dishes at that gathering still lack a recipe?
@@ -162,8 +171,12 @@ export default function RecipeFormPage() {
   }, [file])
 
   const eventsSorted = useMemo(
-    () => [...(events.data ?? [])].sort((a, b) => b.starts_at.localeCompare(a.starts_at)),
-    [events.data]
+    () => {
+      const list = events.data ?? []
+      const all = linkedEvent && !list.some((e) => e.id === linkedEvent.id) ? [...list, linkedEvent] : list
+      return [...all].sort((a, b) => b.starts_at.localeCompare(a.starts_at))
+    },
+    [events.data, linkedEvent]
   )
 
   const existingImage = editing && keepImage ? mediaUrl(existing.data?.image_path) : null
