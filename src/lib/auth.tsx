@@ -1,0 +1,92 @@
+"use client"
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react"
+import type { Session } from "@supabase/supabase-js"
+import { isSupabaseConfigured, supabase } from "@/lib/supabase"
+
+type AuthStatus = "loading" | "ready" | "unavailable"
+
+interface AuthValue {
+  status: AuthStatus
+  session: Session | null
+  userId: string | null
+  /** Reason guest sign-in failed, when status is "unavailable". */
+  error: string | null
+  /** Try again to get a guest session; resolves to the session if it worked. */
+  ensureSession: () => Promise<Session | null>
+}
+
+const AuthContext = createContext<AuthValue | null>(null)
+
+/**
+ * Guests never see a login flow. If there is no session on startup we quietly
+ * sign in anonymously so RLS can track who owns which dishes and recipes.
+ */
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null)
+  const [status, setStatus] = useState<AuthStatus>("loading")
+  const [error, setError] = useState<string | null>(null)
+
+  const ensureSession = useCallback(async () => {
+    if (!isSupabaseConfigured) return null
+    const {
+      data: { session: existing },
+    } = await supabase.auth.getSession()
+    if (existing) {
+      setSession(existing)
+      setStatus("ready")
+      setError(null)
+      return existing
+    }
+    const { data, error: signInError } = await supabase.auth.signInAnonymously()
+    if (signInError || !data.session) {
+      setSession(null)
+      setStatus("unavailable")
+      setError(signInError?.message ?? "Could not start a guest session.")
+      return null
+    }
+    setSession(data.session)
+    setStatus("ready")
+    setError(null)
+    return data.session
+  }, [])
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+      setSession(next)
+      if (next) {
+        setStatus("ready")
+        setError(null)
+      }
+    })
+    void ensureSession()
+    return () => sub.subscription.unsubscribe()
+  }, [ensureSession])
+
+  const value = useMemo<AuthValue>(
+    () => ({
+      status,
+      session,
+      userId: session?.user.id ?? null,
+      error,
+      ensureSession,
+    }),
+    [status, session, error, ensureSession]
+  )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>")
+  return ctx
+}
