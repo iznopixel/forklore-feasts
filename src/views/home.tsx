@@ -3,23 +3,55 @@
 import Link from "next/link"
 import { ArrowRightIcon, BookOpenTextIcon, CalendarBlankIcon, HandHeartIcon } from "@phosphor-icons/react"
 import { Annotation, Flourish, SectionHeader, Sparkle } from "@/components/cookbook/ornaments"
-import { PosterCard, StubCard } from "@/components/cookbook/event-cards"
+import { PosterCard } from "@/components/cookbook/event-cards"
 import { RecipeCard } from "@/components/cookbook/recipe-card"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import { buttonVariants } from "@/components/ui/button"
 import { fetchEvents, fetchRecipes } from "@/lib/api"
-import { isUpcoming } from "@/lib/format"
+import { isUpcoming, longDate } from "@/lib/format"
+import { mediaUrl } from "@/lib/supabase"
+import type { EventSummary } from "@/lib/types"
 import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
 
+/** The last evening's invitation, taped up like a snapshot. */
+function LastGatheringPhoto({ event }: { event: EventSummary }) {
+  const cover = mediaUrl(event.cover_image_path)
+  const caption = (
+    <figcaption className="px-1 pt-3 pb-1">
+      <h3 className="font-heading text-2xl leading-tight font-bold">{event.title}</h3>
+      <Annotation className="mt-1 block" rotate={-2}>{longDate(event.starts_at)}</Annotation>
+    </figcaption>
+  )
+  return (
+    <div className="relative mx-auto w-full max-w-sm lg:max-w-none">
+      <div className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
+      <figure className="border border-border bg-[#fbf3e3] p-3 text-ink shadow-[5px_5px_0_rgb(44_48_37/0.18)] motion-safe:-rotate-[1deg]">
+        <Link href={`/events/${event.slug}`} className="block outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+          {cover ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={cover} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
+          ) : (
+            <div className="grain flex aspect-square w-full items-center justify-center bg-muted p-6 text-center">
+              <span className="display text-4xl text-wine">{event.title}</span>
+            </div>
+          )}
+        </Link>
+        {caption}
+      </figure>
+    </div>
+  )
+}
+
 export default function HomePage() {
   const events = useAsync(fetchEvents, [])
-  const recipes = useAsync(() => fetchRecipes({}, 6), [])
 
   const all = events.data ?? []
   const upcoming = all.filter((e) => isUpcoming(e.starts_at))
   const past = all.filter((e) => !isUpcoming(e.starts_at)).reverse()
   const featured = upcoming[0]
+  const last = past[0]
+  const recipes = useAsync(() => (last ? fetchRecipes({ eventId: last.id }, 6) : Promise.resolve([])), [last?.id])
 
   return (
     <>
@@ -105,62 +137,46 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Recent recipes */}
-      <section className="mx-auto max-w-6xl border-t border-border px-4 py-16 sm:px-6">
-        <SectionHeader
-          kicker="what everyone’s been cooking"
-          title="Recipes worth sharing"
-          action={
-            <Link href="/recipes" className="inline-flex items-center gap-1 font-heading text-lg font-bold text-tomato hover:underline">
-              All recipes <ArrowRightIcon weight="bold" />
-            </Link>
-          }
-        />
-        {recipes.loading ? (
-          <CardSkeletons />
-        ) : recipes.error ? (
-          <ErrorNote message={recipes.error} onRetry={recipes.reload} />
-        ) : recipes.data && recipes.data.length > 0 ? (
-          <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-            {recipes.data.map((r, i) => (
-              <RecipeCard key={r.id} recipe={r} index={i} />
-            ))}
-          </div>
-        ) : (
-          <EmptyNote
-            title="The recipe box is waiting"
-            action={<Link href="/recipes/new" className={buttonVariants()}>Share the first one</Link>}
-          >
-            Share a favorite and it will be waiting here for the next gathering.
-          </EmptyNote>
-        )}
-      </section>
-
-      {/* Past gatherings */}
+      {/* Last gathering: its invitation beside the recipes that were on the table */}
       <section className="border-t border-border bg-sky">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <SectionHeader kicker="remember when…" title="Evenings we remember" />
-          {events.loading ? (
+          <SectionHeader
+            kicker="remember when…"
+            title="From our last gathering"
+            action={
+              <Link href="/recipes" className="inline-flex items-center gap-1 font-heading text-lg font-bold text-tomato hover:underline">
+                All recipes <ArrowRightIcon weight="bold" />
+              </Link>
+            }
+          />
+          {events.loading || (last && recipes.loading) ? (
             <CardSkeletons count={2} className="lg:grid-cols-2" />
-          ) : past.length > 0 ? (
-            <>
-              <div className="grid gap-5 md:grid-cols-2">
-                {past.slice(0, 4).map((e) => (
-                  <StubCard key={e.id} event={e} />
-                ))}
-              </div>
-              {past.length > 4 && (
-                <Link href="/events" className="mt-6 inline-flex items-center gap-1 font-heading text-lg font-bold text-tomato hover:underline">
-                  The full guest book <ArrowRightIcon weight="bold" />
-                </Link>
+          ) : events.error ? (
+            <ErrorNote message={events.error} onRetry={events.reload} />
+          ) : last ? (
+            <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-14">
+              <LastGatheringPhoto event={last} />
+              {recipes.error ? (
+                <ErrorNote message={recipes.error} onRetry={recipes.reload} />
+              ) : recipes.data && recipes.data.length > 0 ? (
+                <div className="grid gap-7 sm:grid-cols-2">
+                  {recipes.data.map((r, i) => (
+                    <RecipeCard key={r.id} recipe={r} index={i} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyNote
+                  title="No recipes were passed around"
+                  action={<Link href="/recipes/new" className={buttonVariants()}>Share a recipe</Link>}
+                >
+                  Nothing written down from that evening yet. Share a favorite for the next one.
+                </EmptyNote>
               )}
-            </>
+            </div>
           ) : (
-            !events.error && (
-              <p className="font-heading text-xl text-muted-foreground italic">
-                Our first evening together is still ahead. The candles are almost lit.
-              </p>
-            )
+            <p className="font-heading text-xl text-muted-foreground italic">
+              Our first evening together is still ahead. The candles are almost lit.
+            </p>
           )}
           <Flourish className="mx-auto mt-14 max-w-xs text-wine" />
         </div>
