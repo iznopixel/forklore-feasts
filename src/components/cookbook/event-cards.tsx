@@ -142,15 +142,12 @@ export function StubCard({ event }: { event: EventSummary }) {
       href={`/events/${event.slug}`}
       className={cn(
         "paper group relative grid outline-none transition-colors hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/40",
-        cover ? "grid-cols-[8.5rem_1fr]" : "grid-cols-[5.5rem_1fr]"
+        cover ? "grid-cols-[10rem_1fr] sm:grid-cols-[11.5rem_1fr]" : "grid-cols-[5.5rem_1fr]"
       )}
     >
       {cover ? (
-        <div className="relative border-r-2 border-dashed border-border bg-[#fbf3e3] p-2">
-          <img src={cover} alt="" className="aspect-square w-full object-cover" />
-          <span className="font-hand absolute right-2 bottom-2 bg-[#fbf3e3]/90 px-1.5 text-base leading-tight">
-            {d.month} {d.day}
-          </span>
+        <div className="relative min-h-40 border-r-2 border-dashed border-border bg-[#fbf3e3]">
+          <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
         </div>
       ) : (
         <div
@@ -163,7 +160,12 @@ export function StubCard({ event }: { event: EventSummary }) {
           <span className="text-[0.65rem] tracking-widest opacity-80">{d.year}</span>
         </div>
       )}
-      <div className="flex flex-col gap-1.5 p-4">
+      {cover && (
+        <span className="font-hand absolute top-3 right-3 rotate-2 border border-border bg-[#fbf3e3] px-2.5 py-0.5 text-lg leading-tight shadow-[2px_2px_0_rgb(44_48_37/0.15)]">
+          {d.month} {d.day}
+        </span>
+      )}
+      <div className={cn("flex flex-col gap-1.5 p-4", cover && "pr-20 sm:pr-24")}>
         <h3 className="font-heading text-2xl leading-tight font-bold group-hover:text-tomato">{event.title}</h3>
         {event.theme && <p className="font-heading text-sm font-semibold text-wine italic">{event.theme}</p>}
         {event.description && <p className="line-clamp-2 text-sm text-muted-foreground">{event.description}</p>}
