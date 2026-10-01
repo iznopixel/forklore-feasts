@@ -284,12 +284,12 @@
       radial-gradient(ellipse at 20% 0%, rgb(255 246 225 / 0.6), transparent 60%);
   }
 
-  /* Light blue gingham for the recipe-card page */
+  /* Gingham in the site's dusty blue: light ground, mid band (= --sky), darker where bands cross */
   .gingham-blue {
+    background-color: #d6ddd3;
     background-image:
-      repeating-linear-gradient(0deg, rgb(110 160 205 / 0.2) 0 14px, transparent 14px 28px),
-      repeating-linear-gradient(90deg, rgb(110 160 205 / 0.2) 0 14px, transparent 14px 28px),
-      radial-gradient(ellipse at 20% 0%, rgb(255 250 235 / 0.55), transparent 60%);
+      repeating-linear-gradient(0deg, rgb(158 175 161 / 0.5) 0 28px, transparent 28px 56px),
+      repeating-linear-gradient(90deg, rgb(158 175 161 / 0.5) 0 28px, transparent 28px 56px);
   }
 
   .link-underline {
