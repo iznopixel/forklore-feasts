@@ -130,7 +130,7 @@ export default function HomePage() {
       </section>
 
       {/* Past gatherings */}
-      <section className="border-t border-border bg-muted/50">
+      <section className="border-t border-border bg-sky">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <SectionHeader kicker="remember when…" title="Past gatherings" />
           {events.loading ? (

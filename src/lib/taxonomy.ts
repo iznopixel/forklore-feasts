@@ -84,7 +84,7 @@ const PALETTES = [
   { bg: "#2c3025", ink: "#f4eedc", accent: "#d4b04a", misprint: "#14160f" }, // charcoal
   { bg: "#ad8b21", ink: "#2c3025", accent: "#f4eedc", misprint: "#7f6615" }, // mustard
   { bg: "#e7aead", ink: "#2c3025", accent: "#552829", misprint: "#b98483" }, // pink
-  { bg: "#b9c7b9", ink: "#2c3025", accent: "#552829", misprint: "#8c9c8c" }, // sage
+  { bg: "#bac6ba", ink: "#2c3025", accent: "#552829", misprint: "#8c9c8c" }, // sage
 ]
 
 const GLYPHS: { match: RegExp; glyphs: PosterStyle["glyphs"]; scrawl: string }[] = [
