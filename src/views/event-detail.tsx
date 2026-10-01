@@ -14,6 +14,7 @@ import {
 import { DishDialog } from "@/components/cookbook/dish-dialog"
 import { Annotation, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
+import { ThemeVote } from "@/components/cookbook/theme-vote"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,7 +40,7 @@ export default function EventDetailPage() {
   const { slug = "" } = useParams<{ slug?: string }>()
   const router = useRouter()
   const { userId } = useAuth()
-  const { data: event, error, loading, reload } = useAsync(() => fetchEventBySlug(slug), [slug])
+  const { data: event, error, loading, reload } = useAsync(() => fetchEventBySlug(slug), [slug, userId])
 
   const [dishDialog, setDishDialog] = useState<{ open: boolean; dish: Dish | null }>({ open: false, dish: null })
   const [toDelete, setToDelete] = useState<DishWithRecipe | null>(null)
@@ -66,6 +67,7 @@ export default function EventDetailPage() {
   const d = monthDay(event.starts_at)
   const cover = mediaUrl(event.cover_image_path)
   const recipeCount = distinctRecipeCount(event.dishes)
+  const voting = event.theme_voting
 
   const openAdd = () => setDishDialog({ open: true, dish: null })
 
@@ -144,12 +146,12 @@ export default function EventDetailPage() {
         </div>
 
         {/* Details: a sage card on the same gingham, so the cloth carries on to the dishes band */}
-        <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24">
+        <div className={cn("mx-auto max-w-6xl px-4 sm:px-6", voting ? "pb-10 sm:pb-12" : "pb-16 sm:pb-24")}>
           <section className="grid grid-cols-[minmax(0,1fr)] gap-10 rounded-[3px] border border-[#9fae9f]/70 bg-sky px-6 py-10 shadow-[0_28px_50px_-28px_rgb(44_48_37/0.35),0_2px_6px_rgb(60_40_20/0.1)] sm:px-12 sm:py-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] md:items-center md:gap-16">
             <dl className="grid content-start gap-5">
               <div>
                 <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">Theme</dt>
-                <dd className="mt-1 font-display text-xl italic">{event.theme ?? "Anything goes"}</dd>
+                <dd className="mt-1 font-display text-xl italic">{event.theme ?? (voting?.status === "open" ? "Up for a vote" : "Anything goes")}</dd>
               </div>
               <div className="border-t border-foreground/20 pt-5">
                 <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">On the table</dt>
@@ -169,6 +171,12 @@ export default function EventDetailPage() {
             </aside>
           </section>
         </div>
+
+        {voting && (
+          <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24">
+            <ThemeVote eventId={event.id} voting={voting} onChanged={reload} />
+          </div>
+        )}
       </section>
 
       {/* Dishes: the one olive panel on the page */}

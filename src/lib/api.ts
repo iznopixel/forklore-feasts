@@ -9,6 +9,7 @@ import type {
   Recipe,
   RecipeInput,
   RecipeWithEvents,
+  ThemeVoting,
 } from "@/lib/types"
 
 /** Calls our Next.js API, attaching the guest's access token so RLS knows who is asking. */
@@ -69,6 +70,14 @@ export const updateEvent = (id: string, input: EventInput) =>
 export const deleteEvent = async (id: string) => {
   await call(`/api/events/${id}`, { method: "DELETE" })
 }
+
+/** Cast (or change) a guest's theme vote. The same first name always replaces its earlier vote. */
+export const castThemeVote = (eventId: string, optionId: string, firstName: string) =>
+  call<ThemeVoting>(`/api/events/${eventId}/vote`, { method: "POST", json: { option_id: optionId, first_name: firstName } })
+
+/** Host only: settle a tie by choosing the final theme. */
+export const chooseThemeWinner = (eventId: string, optionId: string) =>
+  call<ThemeVoting>(`/api/events/${eventId}/theme`, { method: "POST", json: { option_id: optionId } })
 
 /* ------------------------------ Dishes ------------------------------ */
 

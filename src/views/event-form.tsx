@@ -5,12 +5,13 @@ import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { toast } from "sonner"
-import { ArrowLeftIcon, CameraIcon, XIcon } from "@phosphor-icons/react"
+import { ArrowLeftIcon, CameraIcon, PlusIcon, XIcon } from "@phosphor-icons/react"
 import { FormField } from "@/components/cookbook/form-field"
 import { SectionHeader } from "@/components/cookbook/ornaments"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { createEvent, fetchEventBySlug, fetchHostStatus, updateEvent, uploadImage } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
@@ -19,6 +20,15 @@ import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+const MAX_THEMES = 3
+const MIN_THEMES = 2
+
+interface ThemeDraft {
+  id?: string
+  name: string
+  description: string
+}
+const blankThemes = (): ThemeDraft[] => [{ name: "", description: "" }, { name: "", description: "" }]
 
 export default function EventFormPage() {
   const { slug } = useParams<{ slug?: string }>()
@@ -38,7 +48,10 @@ export default function EventFormPage() {
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [keepImage, setKeepImage] = useState(true)
-  const [errors, setErrors] = useState<{ title?: string; starts?: string; image?: string }>({})
+  const [voting, setVoting] = useState(false)
+  const [themes, setThemes] = useState<ThemeDraft[]>(blankThemes)
+  const [deadline, setDeadline] = useState("")
+  const [errors, setErrors] = useState<{ title?: string; starts?: string; image?: string; themes?: string; deadline?: string }>({})
   const [saving, setSaving] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const hydrated = useRef(false)
@@ -52,7 +65,19 @@ export default function EventFormPage() {
     setDescription(e.description ?? "")
     setStartsAt(format(new Date(e.starts_at), "yyyy-MM-dd'T'HH:mm"))
     setIsPublic(e.is_public)
+    if (e.theme_voting_enabled && e.theme_voting_deadline) {
+      setVoting(true)
+      setDeadline(format(new Date(e.theme_voting_deadline), "yyyy-MM-dd'T'HH:mm"))
+      const saved = e.theme_voting?.options ?? []
+      if (saved.length) setThemes(saved.map((o) => ({ id: o.id, name: o.name, description: o.description ?? "" })))
+    }
   }, [existing.data])
+
+  // Once the deadline has passed the options and deadline are locked (the votes are the record).
+  const votingLocked = Boolean(existing.data?.theme_voting && existing.data.theme_voting.status !== "open")
+
+  const setThemeDraft = (i: number, patch: Partial<ThemeDraft>) =>
+    setThemes((cur) => cur.map((t, j) => (j === i ? { ...t, ...patch } : t)))
 
   useEffect(() => {
     if (!file) return setPreview(null)
@@ -76,6 +101,13 @@ export default function EventFormPage() {
     const found: typeof errors = {}
     if (!title.trim()) found.title = "Give the gathering a title."
     if (!startsAt || Number.isNaN(new Date(startsAt).getTime())) found.starts = "Pick a date and time."
+    if (voting && !votingLocked) {
+      const d = new Date(deadline)
+      if (!deadline || Number.isNaN(d.getTime())) found.deadline = "Pick when voting closes."
+      else if (d.getTime() <= Date.now()) found.deadline = "That’s already past. Pick a time ahead."
+      else if (!found.starts && d.getTime() > new Date(startsAt).getTime()) found.deadline = "Voting should close before the gathering starts."
+      if (themes.some((t) => !t.name.trim())) found.themes = "Give every theme a name, or remove the extra one."
+    }
     setErrors((cur) => ({ image: cur.image, ...found }))
     if (Object.keys(found).length) {
       toast.error("A few things need your attention.")
@@ -93,6 +125,15 @@ export default function EventFormPage() {
         starts_at: new Date(startsAt).toISOString(),
         is_public: isPublic,
         ...(cover_image_path !== undefined ? { cover_image_path } : {}),
+        ...(votingLocked
+          ? {}
+          : {
+              theme_voting: {
+                enabled: voting,
+                deadline: voting ? new Date(deadline).toISOString() : null,
+                options: voting ? themes.map((t) => ({ id: t.id, name: t.name.trim(), description: t.description.trim() || null })) : [],
+              },
+            }),
       }
       const saved = editing && existing.data ? await updateEvent(existing.data.id, input) : await createEvent(input)
       toast.success(editing ? "Gathering updated." : "Gathering created.")
@@ -133,7 +174,15 @@ export default function EventFormPage() {
           <FormField id="ef-title" label="Title" required error={errors.title}>
             <Input id="ef-title" value={title} maxLength={120} aria-invalid={Boolean(errors.title)} onChange={(e) => setTitle(e.target.value)} />
           </FormField>
-          <FormField id="ef-theme" label="Theme" hint="A short tagline, like “Cozy pots & ladles”.">
+          <FormField
+            id="ef-theme"
+            label="Theme"
+            hint={
+              voting
+                ? "Leave this blank if you like. The winning theme from the vote fills it in."
+                : "A short tagline, like “Cozy pots & ladles”."
+            }
+          >
             <Input id="ef-theme" value={theme} maxLength={120} onChange={(e) => setTheme(e.target.value)} />
           </FormField>
           <FormField id="ef-start" label="Date & time" required error={errors.starts}>
@@ -142,6 +191,81 @@ export default function EventFormPage() {
           <FormField id="ef-desc" label="Description">
             <Textarea id="ef-desc" rows={5} value={description} maxLength={2000} onChange={(e) => setDescription(e.target.value)} />
           </FormField>
+
+          <fieldset className="grid gap-4 border border-dashed border-tomato/40 bg-[#fdf8ec]/60 p-4 sm:p-5 dark:bg-card/40">
+            <legend className="px-2 text-[0.8rem] font-bold tracking-[0.1em] uppercase">Theme voting</legend>
+            <label className="flex cursor-pointer items-start gap-3">
+              <Switch
+                checked={voting}
+                disabled={votingLocked}
+                onCheckedChange={setVoting}
+                aria-label="Allow guests to vote on the theme"
+                className="mt-1"
+              />
+              <span>
+                <span className="block font-semibold">Allow guests to vote on the theme</span>
+                <span className="block text-sm text-muted-foreground">
+                  Offer a few themes and let everyone pick. The winner becomes the theme when voting closes.
+                </span>
+              </span>
+            </label>
+
+            {votingLocked && (
+              <p className="font-hand text-xl text-tomato">
+                Voting has closed, so the themes and deadline are locked in.
+              </p>
+            )}
+
+            {voting && !votingLocked && (
+              <div className="grid gap-5">
+                <ol className="grid gap-4">
+                  {themes.map((t, i) => (
+                    <li key={t.id ?? i} className="relative grid gap-3 border border-border bg-paper p-4 sm:grid-cols-2">
+                      <FormField id={`ef-theme-name-${i}`} label={`Theme ${i + 1}`} required>
+                        <Input
+                          id={`ef-theme-name-${i}`}
+                          value={t.name}
+                          maxLength={60}
+                          placeholder={["Pie Party", "Dumpling Day", "Brunch for Dinner"][i]}
+                          onChange={(e) => setThemeDraft(i, { name: e.target.value })}
+                        />
+                      </FormField>
+                      <FormField id={`ef-theme-desc-${i}`} label="A line about it">
+                        <Input
+                          id={`ef-theme-desc-${i}`}
+                          value={t.description}
+                          maxLength={140}
+                          placeholder="Sweet, savory, everything in a crust"
+                          onChange={(e) => setThemeDraft(i, { description: e.target.value })}
+                        />
+                      </FormField>
+                      {themes.length > MIN_THEMES && (
+                        <button
+                          type="button"
+                          onClick={() => setThemes((cur) => cur.filter((_, j) => j !== i))}
+                          className="absolute -top-2 -right-2 grid size-7 place-items-center rounded-full border border-wine bg-paper text-wine"
+                          aria-label={`Remove theme ${i + 1}`}
+                        >
+                          <XIcon weight="bold" className="size-4" />
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+                {errors.themes && <p role="alert" className="text-sm font-semibold text-destructive">{errors.themes}</p>}
+                {themes.length < MAX_THEMES && (
+                  <div>
+                    <Button type="button" variant="outline" onClick={() => setThemes((cur) => [...cur, { name: "", description: "" }])}>
+                      <PlusIcon weight="bold" /> Add a third theme
+                    </Button>
+                  </div>
+                )}
+                <FormField id="ef-deadline" label="Voting closes" required error={errors.deadline} hint="Before the gathering starts. After this, the top theme is chosen. If it’s a tie, you’ll pick.">
+                  <Input id="ef-deadline" type="datetime-local" value={deadline} aria-invalid={Boolean(errors.deadline)} onChange={(e) => setDeadline(e.target.value)} />
+                </FormField>
+              </div>
+            )}
+          </fieldset>
 
           <fieldset className="grid gap-2">
             <legend className="mb-1 text-[0.8rem] font-bold tracking-[0.1em] uppercase">Event visibility</legend>

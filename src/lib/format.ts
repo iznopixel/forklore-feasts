@@ -29,3 +29,6 @@ export function minutesLabel(min?: number | null) {
 export function distinctRecipeCount(dishes: { recipe_id: string | null }[]) {
   return new Set(dishes.map((d) => d.recipe_id).filter(Boolean)).size
 }
+
+/** "January 10 at 6:00 PM" */
+export const deadlineLabel = (iso: string) => format(new Date(iso), "MMMM d 'at' h:mm a")

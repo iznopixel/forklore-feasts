@@ -9,8 +9,52 @@ export interface Event {
   host_user_id: string | null
   /** false = unlisted: reachable by link, hidden from listings */
   is_public: boolean
+  /** Guests vote on the theme until `theme_voting_deadline`; see ThemeVoting for what the page shows. */
+  theme_voting_enabled: boolean
+  theme_voting_deadline: string | null
+  theme_voting_status: ThemeVotingStatus
+  theme_winner_option_id: string | null
   created_at: string
   updated_at: string
+}
+
+export type ThemeVotingStatus = "open" | "closed" | "finalized"
+
+export interface ThemeOption {
+  id: string
+  position: number
+  name: string
+  description: string | null
+  /** Only present when the viewer may see totals (the host, or anyone once voting has closed). */
+  votes?: number
+  /** After the deadline: this option has the most votes and shares the lead with another (or nobody voted). */
+  tied?: boolean
+}
+
+/** Everything the event page needs for theme voting, computed by the database for this viewer. */
+export interface ThemeVoting {
+  status: ThemeVotingStatus
+  deadline: string
+  is_host: boolean
+  options: ThemeOption[]
+  winner_option_id: string | null
+  /** The option the current guest session last voted for. */
+  my_vote_option_id: string | null
+  total_votes: number | null
+}
+
+export interface ThemeOptionInput {
+  /** Existing option id, so its votes survive an edit. */
+  id?: string
+  name: string
+  description: string | null
+}
+
+export interface ThemeVotingInput {
+  enabled: boolean
+  /** ISO timestamp; required when enabled */
+  deadline: string | null
+  options: ThemeOptionInput[]
 }
 
 export interface Recipe {
@@ -49,7 +93,7 @@ export interface Dish {
 
 /** Event -> many Dishes -> optional Recipe */
 export type DishWithRecipe = Dish & { recipes: Recipe | null }
-export type EventWithDishes = Event & { dishes: DishWithRecipe[] }
+export type EventWithDishes = Event & { dishes: DishWithRecipe[]; theme_voting: ThemeVoting | null }
 
 /** Lightweight event summary used on listing cards. */
 export type EventSummary = Event & {
@@ -94,4 +138,6 @@ export interface EventInput {
   starts_at: string
   is_public: boolean
   cover_image_path?: string | null
+  /** Omit to leave voting as it is (e.g. once it has closed). */
+  theme_voting?: ThemeVotingInput
 }
