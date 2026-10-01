@@ -79,11 +79,12 @@ export interface PosterStyle {
 }
 
 const PALETTES = [
-  { bg: "#c74624", ink: "#fff3df", accent: "#f0c15c", misprint: "#7d2410" }, // tomato
-  { bg: "#66743a", ink: "#fbf0d9", accent: "#f0c15c", misprint: "#3f4a21" }, // moss
-  { bg: "#6b1f33", ink: "#f8e6cc", accent: "#e99f8a", misprint: "#3f0f1d" }, // wine
-  { bg: "#d9a441", ink: "#3b1d1c", accent: "#6b1f33", misprint: "#a97a1f" }, // ochre
-  { bg: "#d98671", ink: "#3b1d1c", accent: "#6b1f33", misprint: "#a95a47" }, // coral
+  { bg: "#552829", ink: "#f4eedc", accent: "#e7aead", misprint: "#331617" }, // maroon
+  { bg: "#a59b41", ink: "#2c3025", accent: "#f4eedc", misprint: "#7d7530" }, // olive
+  { bg: "#2c3025", ink: "#f4eedc", accent: "#d4b04a", misprint: "#14160f" }, // charcoal
+  { bg: "#ad8b21", ink: "#2c3025", accent: "#f4eedc", misprint: "#7f6615" }, // mustard
+  { bg: "#e7aead", ink: "#2c3025", accent: "#552829", misprint: "#b98483" }, // pink
+  { bg: "#b9c7b9", ink: "#2c3025", accent: "#552829", misprint: "#8c9c8c" }, // sage
 ]
 
 const GLYPHS: { match: RegExp; glyphs: PosterStyle["glyphs"]; scrawl: string }[] = [

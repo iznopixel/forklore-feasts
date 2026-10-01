@@ -24,7 +24,7 @@ export default function HomePage() {
   return (
     <>
       {/* Hero: the illustration holds the table on the left; the empty parchment on the right carries the title */}
-      <section className="relative overflow-hidden border-b-[3px] border-double border-foreground/70 bg-[#f4e6c8] text-[#3b1d1c]">
+      <section className="relative overflow-hidden border-b-[3px] border-double border-foreground/70 bg-[#f4e6c8] text-[#2c3025]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero-feast.webp"
@@ -39,11 +39,11 @@ export default function HomePage() {
             <Annotation className="mb-5 block text-[1.6rem] lg:mb-[1.2vw] lg:text-[2vw]" rotate={-3}>
               ~ a neighborhood potluck cookbook ~
             </Annotation>
-            <h1 className="display text-[clamp(4rem,12vw,8.5rem)] text-[#6b1f33] lg:text-[6.4vw]">
+            <h1 className="display text-[clamp(4rem,12vw,8.5rem)] text-[#2c3025] lg:text-[6.4vw]">
               Forklore
               <br />
-              <span className="text-[#c74624]">Feasts</span>
-              <Sparkle className="ml-2 inline size-[0.45em] -translate-y-[0.5em] text-[#d9a441]" />
+              <span className="text-[#552829]">Feasts</span>
+              <Sparkle className="ml-2 inline size-[0.45em] -translate-y-[0.5em] text-[#ad8b21]" />
             </h1>
             <p className="mt-5 max-w-[32ch] font-heading text-2xl leading-snug font-medium italic lg:mt-[1vw] lg:max-w-[40ch] lg:text-[1.5vw]">
               One long table, a dozen dishes, and every recipe written down so it never gets lost.
@@ -54,7 +54,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/recipes"
-                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-[#3b1d1c]/60 bg-[#fbf3e3]/70 text-[#3b1d1c] hover:bg-[#fbf3e3]")}
+                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-[#2c3025]/60 bg-[#f4eedc]/70 text-[#2c3025] hover:bg-[#f4eedc]")}
               >
                 <BookOpenTextIcon weight="bold" /> Browse recipes
               </Link>

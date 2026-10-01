@@ -185,7 +185,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       className={cn(
         "inline-flex h-9 items-center gap-1.5 rounded-sm border px-3 text-sm font-bold tracking-wide transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
         active
-          ? "border-wine bg-wine text-[#fbf0d9] shadow-[2px_2px_0_var(--ochre)]"
+          ? "border-wine bg-wine text-background shadow-[2px_2px_0_var(--ochre)]"
           : "border-foreground/40 bg-paper hover:bg-muted"
       )}
     >

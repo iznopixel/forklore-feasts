@@ -417,7 +417,7 @@ export default function RecipeFormPage() {
                   onClick={() => toggleTag(t)}
                   className={cn(
                     "inline-flex h-9 items-center gap-1.5 rounded-sm border px-3 text-sm font-bold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-                    on ? "border-moss bg-moss text-[#fbf0d9]" : "border-foreground/40 bg-paper hover:bg-muted"
+                    on ? "border-moss bg-moss text-[#f4eedc]" : "border-foreground/40 bg-paper hover:bg-muted"
                   )}
                 >
                   {on && <CheckIcon weight="bold" className="size-4" />}
@@ -452,7 +452,7 @@ export default function RecipeFormPage() {
           <div className="flex flex-wrap items-center gap-4">
             {shownImage ? (
               <div className="relative">
-                <img src={shownImage} alt="Recipe preview" className="h-32 w-44 -rotate-1 border-4 border-[#fffaf0] object-cover shadow-[2px_2px_0_rgb(59_29_28/0.25)]" />
+                <img src={shownImage} alt="Recipe preview" className="h-32 w-44 -rotate-1 border-4 border-[#fffaf0] object-cover shadow-[2px_2px_0_rgb(44_48_37/0.25)]" />
                 <button
                   type="button"
                   onClick={() => {

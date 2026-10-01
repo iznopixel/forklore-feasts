@@ -120,7 +120,7 @@ export default function RecipeDetailPage() {
             {recipe.description && <p className="mt-6 max-w-[52ch] font-heading text-xl leading-snug italic">{recipe.description}</p>}
           </div>
           {image && (
-            <figure className="rotate-[1.5deg] self-start bg-[#fffaf0] p-2 pb-7 shadow-[3px_3px_0_rgb(59_29_28/0.2)]">
+            <figure className="rotate-[1.5deg] self-start bg-[#fffaf0] p-2 pb-7 shadow-[3px_3px_0_rgb(44_48_37/0.2)]">
               <img src={image} alt={recipe.name} className="aspect-[4/3] w-full object-cover sepia-[0.15]" />
               <figcaption className="font-hand mt-1 text-center text-xl text-muted-foreground">{recipe.name}</figcaption>
             </figure>
