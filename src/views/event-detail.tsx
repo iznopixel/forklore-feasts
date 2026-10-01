@@ -90,7 +90,7 @@ export default function EventDetailPage() {
             <ArrowLeftIcon weight="bold" className="size-3.5" /> All gatherings
           </Link>
 
-          <div className="relative mt-8 grid gap-14 rounded-[3px] border border-[#d8cca9]/80 bg-[#f8f1e1] px-6 py-10 shadow-[0_1px_0_rgb(255_255_255/0.6)_inset,0_28px_50px_-28px_rgb(85_40_41/0.35),0_2px_6px_rgb(60_40_20/0.1)] sm:px-12 sm:py-16 lg:grid-cols-[1fr_minmax(0,24rem)] lg:items-center lg:gap-24">
+          <div className="relative mt-8 grid grid-cols-[minmax(0,1fr)] gap-14 rounded-[3px] border border-[#d8cca9]/80 bg-[#f8f1e1] px-6 py-10 shadow-[0_1px_0_rgb(255_255_255/0.6)_inset,0_28px_50px_-28px_rgb(85_40_41/0.35),0_2px_6px_rgb(60_40_20/0.1)] sm:px-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-center lg:gap-24">
             <div className="max-w-xl">
               <p className="text-[0.7rem] font-bold tracking-[0.3em] text-tomato uppercase">
                 {upcoming ? "You’re invited" : "A gathering to remember"}
