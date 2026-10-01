@@ -16,21 +16,6 @@ export function Sparkle({ className, ...props }: ComponentProps<"svg">) {
   )
 }
 
-/** A hand-drawn-ish leaf sprig. */
-export function Sprig({ className, ...props }: ComponentProps<"svg">) {
-  return (
-    <svg viewBox="0 0 64 64" aria-hidden="true" className={cn("size-8", className)} fill="none" {...props}>
-      <path d="M8 58C16 38 28 22 52 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-      <g fill="currentColor">
-        <path d="M22 41c-7 0-12-4-13-10 7-1 12 2 13 10Z" />
-        <path d="M30 31c-1-7 3-12 9-14 1 7-2 12-9 14Z" />
-        <path d="M37 24c7 1 12-2 15-8-7-2-13 1-15 8Z" />
-        <path d="M17 49c6-3 11-1 14 4-6 3-11 1-14-4Z" />
-      </g>
-    </svg>
-  )
-}
-
 /** Centered divider: rule — sparkle — rule. */
 export function Flourish({ className }: { className?: string }) {
   return (

@@ -15,7 +15,7 @@ import {
   UserIcon,
   UsersIcon,
 } from "@phosphor-icons/react"
-import { Annotation, Flourish, Sparkle, Sprig } from "@/components/cookbook/ornaments"
+import { Annotation, Flourish } from "@/components/cookbook/ornaments"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import {
   AlertDialog,
@@ -89,7 +89,6 @@ export default function RecipeDetailPage() {
       {/* Recipe card */}
       <div className="index-card relative mt-6 p-6 sm:p-10" style={{ backgroundImage: "none" }}>
         <div className="tape -top-3 left-10 -rotate-3" aria-hidden="true" />
-        <Sprig className="absolute top-5 right-5 size-14 rotate-12 text-moss/70" />
         <header className="grid gap-8 md:grid-cols-[1fr_20rem]">
           <div>
             <p className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-moss uppercase">
@@ -144,7 +143,6 @@ export default function RecipeDetailPage() {
         <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,17rem)_1fr] md:gap-14">
           <section aria-labelledby="ingredients">
             <h2 id="ingredients" className="font-heading text-3xl font-bold">Ingredients</h2>
-            <Sparkle className="mt-1 mb-4 size-4 text-ochre" />
             {recipe.ingredients.length > 0 ? (
               <ul className="space-y-2.5">
                 {recipe.ingredients.map((ing, i) => (
@@ -161,7 +159,6 @@ export default function RecipeDetailPage() {
 
           <section aria-labelledby="method">
             <h2 id="method" className="font-heading text-3xl font-bold">Method</h2>
-            <Sparkle className="mt-1 mb-4 size-4 text-ochre" />
             {recipe.instructions.length > 0 ? (
               <ol className="space-y-5">
                 {recipe.instructions.map((step, i) => (

@@ -98,7 +98,7 @@ export function PosterCard({
           </h3>
           {event.theme && (
             <p className="font-heading text-lg font-semibold italic">
-              <span className="not-italic" style={{ color: "var(--poster-accent)" }}>✦</span> {event.theme}
+              {event.theme}
             </p>
           )}
           <p className="max-w-[34ch] text-[0.98rem] leading-snug opacity-95">

@@ -12,7 +12,7 @@ import {
   TrashIcon,
 } from "@phosphor-icons/react"
 import { DishDialog } from "@/components/cookbook/dish-dialog"
-import { Annotation, Flourish, SectionHeader, Sprig, Squiggle } from "@/components/cookbook/ornaments"
+import { Annotation, Flourish, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import {
   AlertDialog,
@@ -92,8 +92,7 @@ export default function EventDetailPage() {
 
           <div className="relative mt-8 grid gap-14 rounded-[3px] border border-[#d8cca9]/80 bg-[#f8f1e1] px-6 py-10 shadow-[0_1px_0_rgb(255_255_255/0.6)_inset,0_28px_50px_-28px_rgb(85_40_41/0.35),0_2px_6px_rgb(60_40_20/0.1)] sm:px-12 sm:py-16 lg:grid-cols-[1fr_minmax(0,24rem)] lg:items-center lg:gap-24">
             <div className="max-w-xl">
-              <p className="flex items-center gap-2 text-[0.7rem] font-bold tracking-[0.3em] text-tomato uppercase">
-                <Sprig className="size-5 -rotate-12" />
+              <p className="text-[0.7rem] font-bold tracking-[0.3em] text-tomato uppercase">
                 {upcoming ? "You’re invited" : "A gathering to remember"}
               </p>
               <h1 className="display mt-5 text-[clamp(2.75rem,8vw,5.75rem)] leading-[0.98] break-words text-foreground">

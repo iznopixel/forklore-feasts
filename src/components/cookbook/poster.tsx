@@ -1,8 +1,6 @@
 "use client"
 
 import type { CSSProperties, ReactNode } from "react"
-import { SparkleIcon } from "@phosphor-icons/react"
-import { Sparkle, Sprig } from "@/components/cookbook/ornaments"
 import { posterStyle } from "@/lib/taxonomy"
 import type { Event } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -32,15 +30,6 @@ export function PosterDecor({ event, density = "full" }: { event: PosterEvent; d
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden text-(--poster-ink)">
       <Big weight="fill" className="absolute -right-6 -bottom-8 size-56 rotate-12 opacity-[0.16] sm:size-72" />
       <Mid weight="duotone" className="absolute top-[18%] right-[8%] size-14 -rotate-12 opacity-40 sm:size-16" />
-      <Sprig className="absolute bottom-6 left-4 size-14 rotate-[-18deg] text-(--poster-accent) opacity-90" />
-      <Sparkle className="absolute top-8 left-[46%] size-5 text-(--poster-accent)" />
-      {density === "full" && (
-        <>
-          <Sparkle className="absolute top-[42%] right-[34%] size-3.5 text-(--poster-ink) opacity-70" />
-          <SparkleIcon weight="fill" className="absolute bottom-[22%] left-[38%] size-4 text-(--poster-accent)" />
-          <Sparkle className="absolute right-6 bottom-[34%] size-6 text-(--poster-accent)" />
-        </>
-      )}
     </div>
   )
 }

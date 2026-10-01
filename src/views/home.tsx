@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { ArrowRightIcon, BookOpenTextIcon, CalendarBlankIcon, HandHeartIcon } from "@phosphor-icons/react"
-import { Annotation, Flourish, SectionHeader, Sparkle } from "@/components/cookbook/ornaments"
+import { Annotation, Flourish, SectionHeader } from "@/components/cookbook/ornaments"
 import { PosterCard } from "@/components/cookbook/event-cards"
 import { RecipeCard } from "@/components/cookbook/recipe-card"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
@@ -79,7 +79,6 @@ export default function HomePage() {
               Forklore
               <br />
               <span className="text-[#552829] lg:text-[#f2b9a8]">Feasts</span>
-              <Sparkle className="ml-2 inline size-[0.45em] -translate-y-[0.5em] text-[#ad8b21] lg:text-[#e8b84f]" />
             </h1>
             <p className="mt-5 max-w-[32ch] font-heading text-2xl leading-snug font-medium italic lg:mt-5 lg:max-w-[34ch]">
               Gather around good food. RSVP, pull up a chair, and share the recipes worth keeping.

@@ -11,7 +11,7 @@ import {
   PlusIcon,
   HouseLineIcon,
 } from "@phosphor-icons/react"
-import { Annotation, Flourish, Sparkle } from "@/components/cookbook/ornaments"
+import { Annotation, Flourish } from "@/components/cookbook/ornaments"
 import { buttonVariants } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Toaster } from "@/components/ui/sonner"
@@ -174,7 +174,7 @@ export function Layout({ children }: { children: ReactNode }) {
             </nav>
           </div>
           <p className="mt-10 flex items-center gap-2 text-sm opacity-80">
-            <Sparkle className="size-3" /> Forklore Feasts · set the table, share the recipe
+            Forklore Feasts · set the table, share the recipe
           </p>
         </div>
       </footer>
