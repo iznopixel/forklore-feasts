@@ -101,7 +101,7 @@ export default function EventDetailPage() {
                 <StarIcon weight="fill" className="size-4" style={{ color: "var(--poster-accent)" }} />
                 {upcoming ? "You’re invited" : "A gathering to remember"}
               </p>
-              <h1 className="display misprint mt-4 text-[clamp(3rem,11vw,7.5rem)] break-words">{event.title}</h1>
+              <h1 className="display misprint mt-4 text-[clamp(3.75rem,14vw,9.5rem)] break-words">{event.title}</h1>
               {event.theme && (
                 <p className="mt-5 font-heading text-[clamp(1.4rem,3.5vw,2.25rem)] leading-tight font-semibold italic">
                   <span className="not-italic" style={{ color: "var(--poster-accent)" }}>✦</span> {event.theme}

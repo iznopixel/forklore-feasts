@@ -95,7 +95,7 @@ export default function RecipeDetailPage() {
             <p className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-moss uppercase">
               <Icon weight="fill" className="size-5" /> {recipe.category ?? "Recipe"}
             </p>
-            <h1 className="display mt-3 text-[clamp(2.5rem,7vw,4.75rem)] text-wine">{recipe.name}</h1>
+            <h1 className="display mt-3 text-[clamp(3.25rem,9vw,6.25rem)] text-wine">{recipe.name}</h1>
             <p className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-lg">
               <span className="inline-flex items-center gap-2">
                 <UserIcon weight="fill" className="size-5 text-tomato" />

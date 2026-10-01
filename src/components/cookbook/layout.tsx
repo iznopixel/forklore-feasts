@@ -52,7 +52,7 @@ function Wordmark({ className }: { className?: string }) {
         <ForkKnifeIcon weight="fill" className="size-6" />
       </span>
       <span className="leading-none">
-        <span className="display block text-[1.7rem] text-foreground">Forklore</span>
+        <span className="display block text-[2.15rem] text-foreground">Forklore</span>
         <span className="mt-0.5 block text-[0.68rem] font-bold tracking-[0.34em] text-wine uppercase">Feasts</span>
       </span>
     </Link>
@@ -159,8 +159,8 @@ export function Layout({ children }: { children: ReactNode }) {
           <Flourish className="mb-8 text-[#e99f8a]" />
           <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
             <div>
-              <p className="display text-4xl text-[#fbf0d9]">Come hungry.</p>
-              <p className="display text-4xl text-[#e99f8a]">Bring something good.</p>
+              <p className="display text-5xl text-[#fbf0d9]">Come hungry.</p>
+              <p className="display text-5xl text-[#e99f8a]">Bring something good.</p>
               <Annotation className="mt-3 block text-[#f0c15c]" rotate={-2}>
                 a neighborhood potluck cookbook, written by everyone
               </Annotation>
