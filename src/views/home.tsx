@@ -72,7 +72,26 @@ export default function HomePage() {
 
       {/* Next gathering */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,34rem)_1fr] lg:gap-16">
+          <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+            {events.loading ? (
+              <div className="paper aspect-square animate-pulse bg-muted/60" aria-busy="true" aria-label="Loading next gathering" />
+            ) : events.error ? (
+              <ErrorNote message={events.error} onRetry={events.reload} />
+            ) : featured ? (
+              <PosterCard event={featured} featured className="motion-safe:-rotate-[1deg]" />
+            ) : (
+              <div className="paper grain relative p-8 text-center">
+                <div className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
+                <HandHeartIcon weight="duotone" className="mx-auto size-14 text-tomato" />
+                <h3 className="mt-3 font-heading text-3xl font-bold">The next feast is still being planned</h3>
+                <p className="mx-auto mt-2 max-w-sm text-muted-foreground">
+                  Check back soon for the next gathering. Meanwhile, the recipe box is open.
+                </p>
+                <Annotation className="mt-3 block" rotate={-2}>save a seat!</Annotation>
+              </div>
+            )}
+          </div>
           <div>
             <Annotation className="mb-4 block" rotate={-2}>pull up a chair</Annotation>
             <h2 className="display text-[clamp(2.5rem,6vw,3.75rem)] text-wine">Next on the table</h2>
@@ -82,25 +101,6 @@ export default function HomePage() {
             <Link href="/events" className="mt-5 inline-flex items-center gap-1 font-heading text-lg font-bold text-tomato hover:underline">
               All gatherings <ArrowRightIcon weight="bold" />
             </Link>
-          </div>
-          <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-            <div className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
-            {events.loading ? (
-              <div className="paper h-[28rem] animate-pulse bg-muted/60" aria-busy="true" aria-label="Loading next gathering" />
-            ) : events.error ? (
-              <ErrorNote message={events.error} onRetry={events.reload} />
-            ) : featured ? (
-              <PosterCard event={featured} featured className="motion-safe:rotate-[1.2deg]" />
-            ) : (
-              <div className="paper grain relative p-8 text-center motion-safe:rotate-[1.2deg]">
-                <HandHeartIcon weight="duotone" className="mx-auto size-14 text-tomato" />
-                <h3 className="mt-3 font-heading text-3xl font-bold">The next feast is still being planned</h3>
-                <p className="mx-auto mt-2 max-w-sm text-muted-foreground">
-                  Check back soon for the next gathering. Meanwhile, the recipe box is open.
-                </p>
-                <Annotation className="mt-3 block" rotate={-2}>save a seat!</Annotation>
-              </div>
-            )}
           </div>
         </div>
       </section>

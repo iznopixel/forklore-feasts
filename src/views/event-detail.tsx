@@ -95,7 +95,7 @@ export default function EventDetailPage() {
             <ArrowLeftIcon weight="bold" /> All gatherings
           </Link>
 
-          <div className="frame mt-6 grid gap-8 p-6 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="frame mt-6 grid gap-8 p-6 sm:p-10 lg:grid-cols-[1fr_minmax(0,26rem)] lg:items-center">
             <div>
               <p className="flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase">
                 <StarIcon weight="fill" className="size-4" style={{ color: "var(--poster-accent)" }} />
@@ -127,10 +127,10 @@ export default function EventDetailPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-6 lg:flex-col">
+            <div className={cn("flex items-center justify-center gap-6 lg:flex-col", cover && "max-lg:order-first")}>
               {cover ? (
-                <figure className="w-56 -rotate-2 bg-[#fbf3e3] p-2 pb-8 text-ink shadow-[4px_4px_0_rgb(0_0_0/0.25)] sm:w-64">
-                  <img src={cover} alt={`${event.title}`} className="aspect-square w-full object-cover sepia-[0.2]" />
+                <figure className="w-full max-w-md -rotate-1 bg-[#fbf3e3] p-3 pb-10 text-ink shadow-[5px_5px_0_rgb(0_0_0/0.25)] lg:max-w-none">
+                  <img src={cover} alt={`${event.title}`} className="aspect-square w-full object-cover" />
                   <figcaption className="font-hand mt-1 text-center text-xl">{d.month} {d.day}</figcaption>
                 </figure>
               ) : (
