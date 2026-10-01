@@ -276,6 +276,14 @@
     outline-offset: -0.7rem;
   }
 
+  /* Quiet linen weave for sunlit-kitchen surfaces */
+  .linen {
+    background-image:
+      repeating-linear-gradient(0deg, rgb(120 90 50 / 0.035) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgb(120 90 50 / 0.035) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at 20% 0%, rgb(255 246 225 / 0.7), transparent 60%);
+  }
+
   .link-underline {
     text-decoration: underline;
     text-decoration-style: wavy;
@@ -287,6 +295,29 @@
   .rule-ornament {
     background:
       linear-gradient(currentColor, currentColor) center / 100% 1px no-repeat;
+  }
+}
+
+/* Invitation-label button: dark oxblood, letterpressed rather than glossy */
+@utility btn-letterpress {
+  background-color: #5a2326;
+  color: #f7ecd8;
+  border: 1px solid #3f1517;
+  border-radius: 0.5rem;
+  letter-spacing: 0.02em;
+  text-shadow: 0 -1px 0 rgb(0 0 0 / 0.35);
+  box-shadow:
+    inset 0 1px 0 rgb(255 235 210 / 0.12),
+    inset 0 -2px 3px rgb(0 0 0 / 0.28),
+    0 1px 2px rgb(60 30 20 / 0.3);
+  &:hover {
+    background-color: #682a2d;
+  }
+  &:active {
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 2px 4px rgb(0 0 0 / 0.4),
+      0 0 0 rgb(0 0 0 / 0);
   }
 }
 

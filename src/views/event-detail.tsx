@@ -7,17 +7,12 @@ import { toast } from "sonner"
 import {
   ArrowLeftIcon,
   BookOpenTextIcon,
-  CalendarBlankIcon,
-  ClockIcon,
   PencilSimpleIcon,
   PlusIcon,
-  QuotesIcon,
-  StarIcon,
   TrashIcon,
 } from "@phosphor-icons/react"
 import { DishDialog } from "@/components/cookbook/dish-dialog"
-import { Annotation, Flourish, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
-import { PosterSurface } from "@/components/cookbook/poster"
+import { Annotation, Flourish, SectionHeader, Sprig, Squiggle } from "@/components/cookbook/ornaments"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import {
   AlertDialog,
@@ -88,82 +83,79 @@ export default function EventDetailPage() {
 
   return (
     <>
-      {/* Poster hero */}
-      <PosterSurface event={event} className="scallop-b pb-16">
-        <div className="mx-auto max-w-6xl px-4 pt-6 pb-10 sm:px-6">
-          <Link href="/events" className="inline-flex items-center gap-2 text-sm font-bold tracking-widest uppercase hover:underline">
-            <ArrowLeftIcon weight="bold" /> All gatherings
+      {/* Invitation spread: parchment page, cookbook-style two columns */}
+      <section className="linen">
+        <div className="mx-auto max-w-6xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-24">
+          <Link href="/events" className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase hover:text-tomato">
+            <ArrowLeftIcon weight="bold" className="size-3.5" /> All gatherings
           </Link>
 
-          <div className="frame mt-6 grid gap-8 p-6 sm:p-10 lg:grid-cols-[1fr_minmax(0,26rem)] lg:items-center">
-            <div>
-              <p className="flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase">
-                <StarIcon weight="fill" className="size-4" style={{ color: "var(--poster-accent)" }} />
+          <div className="relative mt-8 grid gap-14 rounded-[3px] border border-[#d8cca9]/80 bg-[#f8f1e1] px-6 py-10 shadow-[0_1px_0_rgb(255_255_255/0.6)_inset,0_28px_50px_-28px_rgb(85_40_41/0.35),0_2px_6px_rgb(60_40_20/0.1)] sm:px-12 sm:py-16 lg:grid-cols-[1fr_minmax(0,24rem)] lg:items-center lg:gap-24">
+            <div className="max-w-xl">
+              <p className="flex items-center gap-2 text-[0.7rem] font-bold tracking-[0.3em] text-tomato uppercase">
+                <Sprig className="size-5 -rotate-12" />
                 {upcoming ? "You’re invited" : "A gathering to remember"}
               </p>
-              <h1 className="display misprint mt-4 text-[clamp(3.75rem,14vw,9.5rem)] break-words">{event.title}</h1>
+              <h1 className="display mt-5 text-[clamp(2.75rem,8vw,5.75rem)] leading-[0.98] break-words text-foreground">
+                {event.title}
+              </h1>
               {event.theme && (
-                <p className="mt-5 font-heading text-[clamp(1.4rem,3.5vw,2.25rem)] leading-tight font-semibold italic">
-                  <span className="not-italic" style={{ color: "var(--poster-accent)" }}>✦</span> {event.theme}
+                <p className="mt-5 font-heading text-xl leading-snug font-medium text-muted-foreground italic sm:text-2xl">
+                  {event.theme}
                 </p>
               )}
-              <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 text-lg">
-                <span className="inline-flex items-center gap-2 font-bold">
-                  <CalendarBlankIcon weight="fill" className="size-6" /> {longDate(event.starts_at)}
-                </span>
-                <span className="inline-flex items-center gap-2 font-bold">
-                  <ClockIcon weight="fill" className="size-6" /> {timeOfDay(event.starts_at)}
-                </span>
-              </div>
-              <div className="mt-8 flex flex-wrap items-center gap-5">
-                <Button
-                  size="lg"
-                  onClick={openAdd}
-                  className="border-current bg-(--poster-ink) text-(--poster-bg) shadow-[3px_3px_0_var(--poster-accent)] hover:bg-(--poster-ink)/90"
-                >
+
+              <dl className="mt-10 grid grid-cols-2 border-y border-[#cdbf99]/70 py-5">
+                <div className="pr-6">
+                  <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">Date</dt>
+                  <dd className="mt-1 font-display text-xl leading-tight sm:text-2xl">{longDate(event.starts_at)}</dd>
+                </div>
+                <div className="border-l border-[#cdbf99]/70 pl-6">
+                  <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">Time</dt>
+                  <dd className="mt-1 font-display text-xl leading-tight sm:text-2xl">{timeOfDay(event.starts_at)}</dd>
+                </div>
+              </dl>
+
+              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+                <Button size="lg" onClick={openAdd} className="btn-letterpress h-11 px-6 text-base">
                   <PlusIcon weight="bold" /> {upcoming ? "Add what you’re bringing" : "Add what you brought"}
                 </Button>
-                <Annotation className="text-(--poster-accent)" rotate={-4}>{style.scrawl}</Annotation>
+                <Annotation className="text-tomato" rotate={-3}>{style.scrawl}</Annotation>
               </div>
             </div>
 
-            <div className={cn("flex items-center justify-center gap-6 lg:flex-col", cover && "max-lg:order-first")}>
+            <div className={cn("relative mx-auto w-full max-w-sm lg:max-w-none", cover && "max-lg:order-first")}>
+              <div aria-hidden="true" className="absolute -inset-x-4 inset-y-6 -z-0 hidden rotate-[2deg] bg-moss/25 lg:block" />
               {cover ? (
-                <figure className="w-full max-w-md -rotate-1 bg-[#fbf3e3] p-3 pb-10 text-ink shadow-[5px_5px_0_rgb(0_0_0/0.25)] lg:max-w-none">
-                  <img src={cover} alt={`${event.title}`} className="aspect-square w-full object-cover" />
-                  <figcaption className="font-hand mt-1 text-center text-xl">{d.month} {d.day}</figcaption>
+                <figure className="relative max-w-md rotate-[1.5deg] bg-[#fdf8ec] p-3 pb-10 text-ink shadow-[0_1px_2px_rgb(60_40_20/0.25),0_14px_28px_-8px_rgb(60_40_20/0.35)] lg:max-w-none">
+                  <img src={cover} alt={event.title} className="aspect-square w-full object-cover" />
+                  <figcaption className="font-hand absolute inset-x-0 bottom-2 text-center text-xl text-tomato">
+                    {d.month} {d.day}
+                  </figcaption>
                 </figure>
               ) : (
-                <div className="flex size-36 rotate-6 flex-col items-center justify-center rounded-full border-[3px] border-current text-center leading-none sm:size-44">
-                  <span className="text-xs font-bold tracking-[0.3em] uppercase">{d.weekday}</span>
-                  <span className="font-heading text-6xl font-black sm:text-7xl">{d.day}</span>
-                  <span className="text-xs font-bold tracking-[0.3em] uppercase">{d.month} {d.year}</span>
+                <div className="relative mx-auto flex size-36 rotate-6 flex-col items-center justify-center rounded-full border-[1.5px] border-tomato/80 text-center leading-none text-tomato outline-1 outline-offset-4 outline-tomato/40">
+                  <span className="text-[0.6rem] font-bold tracking-[0.3em] uppercase">{d.weekday}</span>
+                  <span className="my-1 font-display text-5xl">{d.day}</span>
+                  <span className="text-[0.6rem] font-bold tracking-[0.3em] uppercase">{d.month} {d.year}</span>
                 </div>
               )}
             </div>
           </div>
         </div>
-      </PosterSurface>
+      </section>
 
       {/* Details */}
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <section className="-mt-2 grid gap-8 py-12 md:grid-cols-[1fr_1.4fr]">
-          <dl className="paper grid grid-cols-2 content-start gap-x-4 gap-y-5 p-6">
+        <section className="grid gap-12 pb-20 md:grid-cols-[1fr_1.4fr] md:items-start">
+          <dl className="grid content-start gap-5 border-t border-[#cdbf99]/70 pt-6">
             <div>
-              <dt className="text-[0.7rem] font-bold tracking-[0.18em] text-wine uppercase">Date</dt>
-              <dd className="font-heading text-xl font-bold">{longDate(event.starts_at)}</dd>
+              <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">Theme</dt>
+              <dd className="mt-1 font-display text-xl italic">{event.theme ?? "Anything goes"}</dd>
             </div>
-            <div>
-              <dt className="text-[0.7rem] font-bold tracking-[0.18em] text-wine uppercase">Time</dt>
-              <dd className="font-heading text-xl font-bold">{timeOfDay(event.starts_at)}</dd>
-            </div>
-            <div className="col-span-2 border-t border-dashed border-border pt-4">
-              <dt className="text-[0.7rem] font-bold tracking-[0.18em] text-wine uppercase">Theme</dt>
-              <dd className="font-heading text-xl font-bold italic">{event.theme ?? "Anything goes"}</dd>
-            </div>
-            <div className="col-span-2 border-t border-dashed border-border pt-4">
-              <dt className="text-[0.7rem] font-bold tracking-[0.18em] text-wine uppercase">On the table</dt>
-              <dd className="font-semibold">
+            <div className="border-t border-[#cdbf99]/70 pt-5">
+              <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">On the table</dt>
+              <dd className="mt-1 font-semibold">
                 {event.dishes.length} {event.dishes.length === 1 ? "dish" : "dishes"} · {recipeCount} {recipeCount === 1 ? "recipe" : "recipes"} shared
               </dd>
             </div>
@@ -171,22 +163,24 @@ export default function EventDetailPage() {
 
           <aside className="index-card relative p-6 sm:p-8 md:-rotate-[0.6deg]">
             <div className="tape -top-3 right-10 rotate-3" aria-hidden="true" />
-            <Annotation className="mb-2 block" rotate={-2}>a note from your host</Annotation>
-            <QuotesIcon weight="fill" className="mb-1 size-7 text-tomato" />
+            <Annotation className="mb-3 block" rotate={-2}>a note from your host</Annotation>
             <p className="font-heading text-xl leading-snug">
               {event.description ??
                 "Come as you are and bring a dish to share. There’s always room for one more chair."}
             </p>
           </aside>
         </section>
+      </div>
 
-        {/* Dishes */}
-        <section className="pb-20">
+      {/* Dishes: the one olive panel on the page */}
+      <div className="border-t border-[#cdbf99]/70 bg-[color-mix(in_oklab,var(--moss)_16%,var(--background))]">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+        <section>
           <SectionHeader
             kicker={upcoming ? "who’s bringing what" : "what we shared"}
             title="On the table"
             action={
-              <Button onClick={openAdd}>
+              <Button onClick={openAdd} className="btn-letterpress">
                 <PlusIcon weight="bold" /> {upcoming ? "Add what you’re bringing" : "Add what you brought"}
               </Button>
             }
@@ -195,12 +189,12 @@ export default function EventDetailPage() {
           {event.dishes.length === 0 ? (
             <EmptyNote
               title="The table’s still bare"
-              action={<Button onClick={openAdd}><PlusIcon weight="bold" /> Be the first to add a dish</Button>}
+              action={<Button onClick={openAdd} className="btn-letterpress"><PlusIcon weight="bold" /> Be the first to add a dish</Button>}
             >
               Add a dish, even a half-formed idea, so everyone can plan around it.
             </EmptyNote>
           ) : (
-            <ul className="grid gap-5 md:grid-cols-2">
+            <ul className="grid gap-6 md:grid-cols-2">
               {event.dishes.map((dish) => (
                 <DishItem
                   key={dish.id}
@@ -213,8 +207,9 @@ export default function EventDetailPage() {
               ))}
             </ul>
           )}
-          <Flourish className="mx-auto mt-16 max-w-xs text-wine" />
+          <Flourish className="mx-auto mt-16 max-w-xs text-tomato" />
         </section>
+        </div>
       </div>
 
       <DishDialog
@@ -264,8 +259,8 @@ function DishItem({
   const recipe = dish.recipes
   return (
     <li className={cn("paper relative flex gap-4 p-5", mine && "border-l-[5px] border-l-moss")}>
-      <div className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-wine bg-ochre/30 text-wine">
-        <Icon weight="fill" className="size-7" />
+      <div className="grid size-10 shrink-0 place-items-center rounded-full border border-tomato/50 text-tomato">
+        <Icon weight="regular" className="size-5" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
