@@ -81,7 +81,8 @@ export default function RecipeDetailPage() {
   }
 
   return (
-    <article className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <article className="gingham-blue -mb-24">
+      <div className="mx-auto max-w-5xl px-4 pt-10 pb-16 sm:px-6">
       <Link href="/recipes" className="inline-flex items-center gap-2 text-sm font-bold tracking-widest text-wine uppercase hover:underline">
         <ArrowLeftIcon weight="bold" /> All recipes
       </Link>
@@ -211,6 +212,7 @@ export default function RecipeDetailPage() {
         </div>
       )}
       <Flourish className="mx-auto mt-14 max-w-xs text-wine" />
+      </div>
 
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
         <AlertDialogContent>
