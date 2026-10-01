@@ -85,7 +85,7 @@ export default function EventDetailPage() {
     <>
       {/* Invitation spread: parchment page, cookbook-style two columns */}
       <section className="linen">
-        <div className="mx-auto max-w-6xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-24">
+        <div className="mx-auto max-w-6xl px-4 pt-8 pb-10 sm:px-6 sm:pt-10 sm:pb-12">
           <Link href="/events" className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase hover:text-tomato">
             <ArrowLeftIcon weight="bold" className="size-3.5" /> All gatherings
           </Link>
@@ -142,34 +142,34 @@ export default function EventDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Details: a sage card on the same gingham, so the cloth carries on to the dishes band */}
+        <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24">
+          <section className="grid grid-cols-[minmax(0,1fr)] gap-10 rounded-[3px] border border-[#9fae9f]/70 bg-sky px-6 py-10 shadow-[0_28px_50px_-28px_rgb(44_48_37/0.35),0_2px_6px_rgb(60_40_20/0.1)] sm:px-12 sm:py-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] md:items-center md:gap-16">
+            <dl className="grid content-start gap-5">
+              <div>
+                <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">Theme</dt>
+                <dd className="mt-1 font-display text-xl italic">{event.theme ?? "Anything goes"}</dd>
+              </div>
+              <div className="border-t border-foreground/20 pt-5">
+                <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">On the table</dt>
+                <dd className="mt-1 font-semibold">
+                  {event.dishes.length} {event.dishes.length === 1 ? "dish" : "dishes"} · {recipeCount} {recipeCount === 1 ? "recipe" : "recipes"} shared
+                </dd>
+              </div>
+            </dl>
+
+            <aside className="index-card relative p-6 sm:p-8 md:-rotate-[0.6deg]">
+              <div className="tape -top-3 right-10 rotate-3" aria-hidden="true" />
+              <Annotation className="mb-3 block" rotate={-2}>a note from your host</Annotation>
+              <p className="font-heading text-xl leading-snug">
+                {event.description ??
+                  "Come as you are and bring a dish to share. There’s always room for one more chair."}
+              </p>
+            </aside>
+          </section>
+        </div>
       </section>
-
-      {/* Details */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <section className="grid gap-12 pb-20 md:grid-cols-[1fr_1.4fr] md:items-start">
-          <dl className="grid content-start gap-5 border-t border-[#cdbf99]/70 pt-6">
-            <div>
-              <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">Theme</dt>
-              <dd className="mt-1 font-display text-xl italic">{event.theme ?? "Anything goes"}</dd>
-            </div>
-            <div className="border-t border-[#cdbf99]/70 pt-5">
-              <dt className="text-[0.65rem] font-bold tracking-[0.25em] text-tomato uppercase">On the table</dt>
-              <dd className="mt-1 font-semibold">
-                {event.dishes.length} {event.dishes.length === 1 ? "dish" : "dishes"} · {recipeCount} {recipeCount === 1 ? "recipe" : "recipes"} shared
-              </dd>
-            </div>
-          </dl>
-
-          <aside className="index-card relative p-6 sm:p-8 md:-rotate-[0.6deg]">
-            <div className="tape -top-3 right-10 rotate-3" aria-hidden="true" />
-            <Annotation className="mb-3 block" rotate={-2}>a note from your host</Annotation>
-            <p className="font-heading text-xl leading-snug">
-              {event.description ??
-                "Come as you are and bring a dish to share. There’s always room for one more chair."}
-            </p>
-          </aside>
-        </section>
-      </div>
 
       {/* Dishes: the one olive panel on the page */}
       <div className="border-t border-[#cdbf99]/70 bg-[color-mix(in_oklab,var(--moss)_16%,var(--background))]">
