@@ -93,3 +93,6 @@ create policy "hosts delete own events" on public.events
 -- select email, name, created_at from public.hosts where status = 'pending';
 -- update public.hosts set status = 'approved' where email = 'someone@example.com';
 -- Revoke: update public.hosts set status = 'pending' where email = '...';  (or delete the row)
+
+-- Make the API pick up the new functions right away (otherwise: "Could not find the function ... in the schema cache")
+notify pgrst, 'reload schema';
