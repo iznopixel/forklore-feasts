@@ -33,6 +33,10 @@ Browser ──fetch──▶ Next.js /api/* route handlers ──▶ Supabase (P
 
 `owner_user_id` and slugs are never sent; the database fills them. Only the publishable key is used.
 
+## Captcha (optional)
+
+To protect guest sign-in from bots, create a Cloudflare Turnstile widget, put its secret key in Supabase (Auth → Attack Protection → Enable Captcha, provider Turnstile) and set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` to the site key. It stays invisible unless Cloudflare wants a challenge. If Supabase captcha is on but the site key is missing, anonymous sign-in will fail.
+
 ## Supabase setup needed
 
 - **Authentication → Sign In / Providers → Anonymous sign-ins must be enabled.** Until it is, the site is browsable but saving shows a friendly notice.

@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react"
 import type { Session } from "@supabase/supabase-js"
+import { getCaptchaToken } from "@/lib/captcha"
 import { isSupabaseConfigured, supabase } from "@/lib/supabase"
 
 type AuthStatus = "loading" | "ready" | "unavailable"
@@ -46,7 +47,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null)
       return existing
     }
-    const { data, error: signInError } = await supabase.auth.signInAnonymously()
+    let captchaToken: string | undefined
+    try {
+      captchaToken = await getCaptchaToken()
+    } catch (e) {
+      setSession(null)
+      setStatus("unavailable")
+      setError(e instanceof Error ? e.message : "Captcha check failed.")
+      return null
+    }
+    const { data, error: signInError } = await supabase.auth.signInAnonymously({
+      options: captchaToken ? { captchaToken } : undefined,
+    })
     if (signInError || !data.session) {
       setSession(null)
       setStatus("unavailable")
