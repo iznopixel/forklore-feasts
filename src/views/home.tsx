@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { ArrowRightIcon, HandHeartIcon } from "@phosphor-icons/react"
-import { Annotation, Flourish, SectionHeader } from "@/components/cookbook/ornaments"
+import { Annotation, SectionHeader } from "@/components/cookbook/ornaments"
 import { PosterCard } from "@/components/cookbook/event-cards"
 import { RecipeCard } from "@/components/cookbook/recipe-card"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
@@ -145,7 +145,7 @@ export default function HomePage() {
       </section>
 
       {/* Last gathering: its invitation beside the recipes that were on the table */}
-      <section className="border-t border-border bg-sky">
+      <section className="-mb-24 border-t border-border bg-sky">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <SectionHeader
             kicker="remember when…"
@@ -185,7 +185,6 @@ export default function HomePage() {
               Our first evening together is still ahead. The candles are almost lit.
             </p>
           )}
-          <Flourish className="mx-auto mt-14 max-w-xs text-wine" />
         </div>
       </section>
     </>
