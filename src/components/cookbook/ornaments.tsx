@@ -90,7 +90,7 @@ export function SectionHeader({
   return (
     <header className={cn("mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-3", className)}>
       <div>
-        {kicker && <Annotation className="mb-1 block" rotate={-2}>{kicker}</Annotation>}
+        {kicker && <Annotation className="mb-3 block" rotate={-2}>{kicker}</Annotation>}
         <Tag className="display text-[clamp(2.75rem,6.5vw,4.75rem)] text-foreground">{title}</Tag>
         <Squiggle className="mt-3 text-tomato" />
       </div>

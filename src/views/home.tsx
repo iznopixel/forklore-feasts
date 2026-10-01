@@ -36,7 +36,7 @@ export default function HomePage() {
         />
         <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:absolute lg:inset-0 lg:max-w-none lg:p-0">
           <div className="lg:absolute lg:top-[4.5%] lg:right-[4%] lg:left-[49%]">
-            <Annotation className="mb-3 block text-[1.6rem] lg:mb-[0.6vw] lg:text-[2vw]" rotate={-3}>
+            <Annotation className="mb-5 block text-[1.6rem] lg:mb-[1.2vw] lg:text-[2vw]" rotate={-3}>
               ~ a neighborhood potluck cookbook ~
             </Annotation>
             <h1 className="display text-[clamp(4rem,12vw,8.5rem)] text-[#6b1f33] lg:text-[6.4vw]">
@@ -67,7 +67,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <Annotation className="mb-2 block" rotate={-2}>pull up a chair</Annotation>
+            <Annotation className="mb-4 block" rotate={-2}>pull up a chair</Annotation>
             <h2 className="display text-[clamp(2.5rem,6vw,3.75rem)] text-wine">Next on the table</h2>
             <p className="mt-4 max-w-[36ch] text-lg text-muted-foreground">
               Bring a dish, bring a friend, and bring an appetite. Every recipe from the evening ends up in the book.
