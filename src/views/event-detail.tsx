@@ -95,7 +95,7 @@ export default function EventDetailPage() {
               <p className="text-[0.7rem] font-bold tracking-[0.3em] text-tomato uppercase">
                 {upcoming ? "You’re invited" : "A gathering to remember"}
               </p>
-              <h1 className="display mt-5 text-[clamp(2.75rem,8vw,5.75rem)] leading-[0.98] break-words text-foreground">
+              <h1 className="display mt-5 text-[clamp(2.5rem,7vw,4.75rem)] leading-[0.98] break-words text-foreground">
                 {event.title}
               </h1>
               {event.theme && (
