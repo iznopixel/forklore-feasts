@@ -162,7 +162,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <p className="display text-5xl text-[#f4eedc]">Come hungry.</p>
               <p className="display text-5xl text-[#e7aead]">Bring something good.</p>
               <Annotation className="mt-3 block text-[#d4b04a]" rotate={-2}>
-                a neighborhood potluck cookbook, written by everyone
+                good food, good company, and recipes worth keeping
               </Annotation>
             </div>
             <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2 font-heading text-lg font-semibold">

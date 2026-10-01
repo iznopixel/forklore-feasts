@@ -7,7 +7,7 @@ import { AuthProvider } from "@/lib/auth"
 
 export const metadata: Metadata = {
   title: { default: "Forklore Feasts", template: "%s · Forklore Feasts" },
-  description: "A neighborhood potluck cookbook: gatherings, dishes, and the recipes behind them.",
+  description: "Gather around good food: RSVP to a supper, share what you’re bringing, and keep the recipes worth remembering.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

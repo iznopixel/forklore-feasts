@@ -67,7 +67,7 @@ export function PosterCard({
               <CountLine event={event} className="mt-1 text-moss" />
             </div>
             <Link href={`/events/${event.slug}`} className={cn(buttonVariants({ size: "lg" }))}>
-              {featured ? "See the menu & join in" : "See details"}
+              {featured ? "RSVP & see the menu" : "See details"}
               <ArrowRightIcon weight="bold" />
             </Link>
           </figcaption>
@@ -120,7 +120,7 @@ export function PosterCard({
                 "border-current bg-(--poster-ink) text-(--poster-bg) shadow-[3px_3px_0_var(--poster-accent)] hover:bg-(--poster-ink)/90"
               )}
             >
-              {featured ? "See the menu & join in" : "See details"}
+              {featured ? "RSVP & see the menu" : "See details"}
               <ArrowRightIcon weight="bold" />
             </Link>
             <Annotation className="text-(--poster-accent)" rotate={-4}>{style.scrawl}</Annotation>

@@ -41,7 +41,7 @@ export default function HomePage() {
         <div className="relative mx-auto px-4 py-10 sm:px-6 lg:absolute lg:inset-0 lg:flex lg:max-w-none lg:items-center lg:p-0 lg:pl-[max(2rem,calc((100vw-72rem)/2+1.5rem))]">
           <div className="lg:max-w-[min(34rem,46vw)]">
             <Annotation className="mb-5 block text-[1.6rem] text-[#552829] lg:mb-4 lg:text-[#f0c9a0]" rotate={-3}>
-              ~ a neighborhood potluck cookbook ~
+              ~ come hungry, stay awhile ~
             </Annotation>
             <h1 className="display text-[clamp(4rem,12vw,8.5rem)] text-[#2c3025] lg:text-[clamp(4.5rem,8vw,7.5rem)] lg:text-[#fbf3e3]">
               Forklore
@@ -50,20 +50,20 @@ export default function HomePage() {
               <Sparkle className="ml-2 inline size-[0.45em] -translate-y-[0.5em] text-[#ad8b21] lg:text-[#e8b84f]" />
             </h1>
             <p className="mt-5 max-w-[32ch] font-heading text-2xl leading-snug font-medium italic lg:mt-5 lg:max-w-[34ch]">
-              One long table, a dozen dishes, and every recipe written down so it never gets lost.
+              Gather around good food. RSVP, pull up a chair, and share the recipes worth keeping.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <Link href="/events" className={cn(buttonVariants({ size: "lg" }), "lg:bg-[#fbf3e3] lg:text-[#2c3025] lg:hover:bg-[#fff8ea]")}>
-                <CalendarBlankIcon weight="bold" /> See the gatherings
+                <CalendarBlankIcon weight="bold" /> RSVP to a gathering
               </Link>
               <Link
-                href="/recipes"
+                href="/recipes/new"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
                   "border-[#2c3025]/60 bg-[#f4eedc]/70 text-[#2c3025] hover:bg-[#f4eedc] lg:border-[#fbf3e3]/70 lg:bg-transparent lg:text-[#fbf3e3] lg:hover:bg-[#fbf3e3]/15"
                 )}
               >
-                <BookOpenTextIcon weight="bold" /> Browse recipes
+                <BookOpenTextIcon weight="bold" /> Share a recipe
               </Link>
             </div>
           </div>
@@ -84,19 +84,19 @@ export default function HomePage() {
               <div className="paper grain relative p-8 text-center">
                 <div className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
                 <HandHeartIcon weight="duotone" className="mx-auto size-14 text-tomato" />
-                <h3 className="mt-3 font-heading text-3xl font-bold">The next feast is still being planned</h3>
+                <h3 className="mt-3 font-heading text-3xl font-bold">The next supper is still being set</h3>
                 <p className="mx-auto mt-2 max-w-sm text-muted-foreground">
-                  Check back soon for the next gathering. Meanwhile, the recipe box is open.
+                  An invitation will be along soon. Until then, the recipe box is open.
                 </p>
                 <Annotation className="mt-3 block" rotate={-2}>save a seat!</Annotation>
               </div>
             )}
           </div>
           <div>
-            <Annotation className="mb-4 block" rotate={-2}>pull up a chair</Annotation>
+            <Annotation className="mb-4 block" rotate={-2}>save your seat</Annotation>
             <h2 className="display text-[clamp(2.5rem,6vw,3.75rem)] text-wine">Next on the table</h2>
             <p className="mt-4 max-w-[36ch] text-lg text-muted-foreground">
-              Bring a dish, bring a friend, and bring an appetite. Every recipe from the evening ends up in the book.
+              Light the candles, set out the good bowls, and RSVP. Tell us what you’re bringing, and the recipe finds its way into the book.
             </p>
             <Link href="/events" className="mt-5 inline-flex items-center gap-1 font-heading text-lg font-bold text-tomato hover:underline">
               All gatherings <ArrowRightIcon weight="bold" />
@@ -108,8 +108,8 @@ export default function HomePage() {
       {/* Recent recipes */}
       <section className="mx-auto max-w-6xl border-t border-border px-4 py-16 sm:px-6">
         <SectionHeader
-          kicker="fresh from the recipe box"
-          title="Recently shared"
+          kicker="what everyone’s been cooking"
+          title="Recipes worth sharing"
           action={
             <Link href="/recipes" className="inline-flex items-center gap-1 font-heading text-lg font-bold text-tomato hover:underline">
               All recipes <ArrowRightIcon weight="bold" />
@@ -128,10 +128,10 @@ export default function HomePage() {
           </div>
         ) : (
           <EmptyNote
-            title="No recipes shared yet"
-            action={<Link href="/recipes/new" className={buttonVariants()}>Be the first to add one</Link>}
+            title="The recipe box is waiting"
+            action={<Link href="/recipes/new" className={buttonVariants()}>Share the first one</Link>}
           >
-            Once someone writes down a dish, it lands here.
+            Share a favorite and it will be waiting here for the next gathering.
           </EmptyNote>
         )}
       </section>
@@ -139,7 +139,7 @@ export default function HomePage() {
       {/* Past gatherings */}
       <section className="border-t border-border bg-sky">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <SectionHeader kicker="remember when…" title="Past gatherings" />
+          <SectionHeader kicker="remember when…" title="Evenings we remember" />
           {events.loading ? (
             <CardSkeletons count={2} className="lg:grid-cols-2" />
           ) : past.length > 0 ? (
@@ -158,7 +158,7 @@ export default function HomePage() {
           ) : (
             !events.error && (
               <p className="font-heading text-xl text-muted-foreground italic">
-                Our first gathering is still ahead of us — memories coming soon.
+                Our first evening together is still ahead. The candles are almost lit.
               </p>
             )
           )}
