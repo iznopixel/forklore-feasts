@@ -68,7 +68,6 @@ export interface RecipeInput {
   category: string | null
   ingredients: string[]
   instructions: string[]
-  tags: string[]
   prep_time_minutes: number | null
   cook_time_minutes: number | null
   servings: number | null

@@ -7,9 +7,7 @@ import { toast } from "sonner"
 import {
   ArrowLeftIcon,
   CameraIcon,
-  CheckIcon,
   CookingPotIcon,
-  PlusIcon,
   XIcon,
 } from "@phosphor-icons/react"
 import { FormField } from "@/components/cookbook/form-field"
@@ -34,7 +32,8 @@ import {
 import { useAuth } from "@/lib/auth"
 import { longDate } from "@/lib/format"
 import { mediaUrl } from "@/lib/supabase"
-import { DIETARY_TAGS, DISH_CATEGORIES, normalizeTag } from "@/lib/taxonomy"
+import { inferDietaryTags } from "@/lib/dietary"
+import { DISH_CATEGORIES } from "@/lib/taxonomy"
 import type { Dish, EventSummary, RecipeInput } from "@/lib/types"
 import { useAsync } from "@/lib/use-async"
 import { getSavedName, saveName, useRequireUser } from "@/lib/use-writer"
@@ -82,8 +81,6 @@ export default function RecipeFormPage() {
   const [description, setDescription] = useState("")
   const [ingredients, setIngredients] = useState("")
   const [instructions, setInstructions] = useState("")
-  const [tags, setTags] = useState<string[]>([])
-  const [customTag, setCustomTag] = useState("")
   const [prep, setPrep] = useState("")
   const [cook, setCook] = useState("")
   const [servings, setServings] = useState("")
@@ -112,7 +109,6 @@ export default function RecipeFormPage() {
     setDescription(r.description ?? "")
     setIngredients(r.ingredients.join("\n"))
     setInstructions(r.instructions.join("\n"))
-    setTags(r.tags)
     setPrep(r.prep_time_minutes?.toString() ?? "")
     setCook(r.cook_time_minutes?.toString() ?? "")
     setServings(r.servings?.toString() ?? "")
@@ -182,13 +178,7 @@ export default function RecipeFormPage() {
   const existingImage = editing && keepImage ? mediaUrl(existing.data?.image_path) : null
   const shownImage = preview ?? existingImage
 
-  const toggleTag = (t: string) =>
-    setTags((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]))
-  const addCustomTag = () => {
-    const t = normalizeTag(customTag)
-    if (t && !tags.includes(t)) setTags((cur) => [...cur, t])
-    setCustomTag("")
-  }
+  const dietary = useMemo(() => inferDietaryTags(toList(ingredients)), [ingredients])
 
   function onPickFile(f: File | null) {
     if (!f) return
@@ -241,7 +231,6 @@ export default function RecipeFormPage() {
         category: category || null,
         ingredients: toList(ingredients),
         instructions: toList(instructions),
-        tags,
         prep_time_minutes: toInt(prep),
         cook_time_minutes: toInt(cook),
         servings: toInt(servings),
@@ -414,48 +403,28 @@ export default function RecipeFormPage() {
           </FormField>
         </div>
 
-        {/* Dietary tags */}
-        <fieldset className="grid gap-3">
-          <legend className="text-[0.8rem] font-bold tracking-[0.1em] uppercase">
-            Dietary tags <span className="font-hand text-lg font-normal tracking-normal text-muted-foreground normal-case">optional</span>
-          </legend>
-          <div className="flex flex-wrap gap-2">
-            {[...DIETARY_TAGS, ...tags.filter((t) => !(DIETARY_TAGS as readonly string[]).includes(t))].map((t) => {
-              const on = tags.includes(t)
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => toggleTag(t)}
-                  className={cn(
-                    "inline-flex h-9 items-center gap-1.5 rounded-sm border px-3 text-sm font-bold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-                    on ? "border-moss bg-moss text-[#f4eedc]" : "border-foreground/40 bg-paper hover:bg-muted"
-                  )}
-                >
-                  {on && <CheckIcon weight="bold" className="size-4" />}
-                  {t}
-                </button>
-              )
-            })}
-          </div>
-          <div className="flex max-w-sm gap-2">
-            <label htmlFor="rf-tag" className="sr-only">Add your own tag</label>
-            <Input
-              id="rf-tag"
-              value={customTag}
-              onChange={(e) => setCustomTag(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  addCustomTag()
-                }
-              }}
-              placeholder="Add your own (e.g. make-ahead)"
-            />
-            <Button type="button" variant="outline" onClick={addCustomTag} aria-label="Add tag"><PlusIcon weight="bold" /></Button>
-          </div>
-        </fieldset>
+        {/* Dietary tags: worked out from the ingredients on save */}
+        <div className="grid gap-1">
+          <p className="text-[0.8rem] font-bold tracking-[0.1em] uppercase">
+            Dietary tags <span className="font-hand text-lg font-normal tracking-normal text-muted-foreground normal-case">dealt with</span>
+          </p>
+          <p className="text-sm text-muted-foreground" aria-live="polite">
+            {dietary.length > 0 ? (
+              <>
+                From your ingredients, we’ll tag this{" "}
+                {dietary.map((t, i) => (
+                  <span key={t}>
+                    {i > 0 && ", "}
+                    <strong className="font-bold text-moss">{t}</strong>
+                  </span>
+                ))}
+                . It’s a good guess, not a promise, so check labels with anyone who has allergies.
+              </>
+            ) : (
+              "Add your ingredients and we’ll work out the dietary tags."
+            )}
+          </p>
+        </div>
 
         {/* Image */}
         <div className="grid gap-2">

@@ -1,4 +1,5 @@
 import "server-only"
+import { inferDietaryTags } from "@/lib/dietary"
 import { ApiError } from "@/server/supabase"
 
 type Raw = Record<string, unknown>
@@ -11,7 +12,7 @@ const list = (v: unknown, max: number) =>
     : []
 const optInt = (v: unknown) => (Number.isInteger(v) && (v as number) > 0 ? (v as number) : null)
 
-/** Whitelists recipe fields — never trusts owner_user_id/slug/id from the client. */
+/** Whitelists recipe fields — never trusts owner_user_id/slug/id/tags from the client. */
 export function sanitizeRecipe(body: Raw) {
   const name = str(body.name, 200)
   const contributor_name = str(body.contributor_name, 100)
@@ -19,14 +20,16 @@ export function sanitizeRecipe(body: Raw) {
   if (!contributor_name) throw new ApiError(400, "Contributor name is required.")
   let source_url = optStr(body.source_url, 500)
   if (source_url && !/^https?:\/\//i.test(source_url)) throw new ApiError(400, "Source must be an http(s) link.")
+  const ingredients = list(body.ingredients, 200)
   const out: Raw = {
     name,
     contributor_name,
     description: optStr(body.description, 2000),
     category: optStr(body.category, 60),
-    ingredients: list(body.ingredients, 200),
+    ingredients,
     instructions: list(body.instructions, 200),
-    tags: list(body.tags, 20).map((t) => t.toLowerCase()),
+    // Tags are worked out from the ingredients; the client can't set them.
+    tags: inferDietaryTags(ingredients),
     prep_time_minutes: optInt(body.prep_time_minutes),
     cook_time_minutes: optInt(body.cook_time_minutes),
     servings: optInt(body.servings),

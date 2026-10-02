@@ -48,23 +48,6 @@ export function categoryIcon(category?: string | null): Icon {
   return CATEGORY_ICONS.find(([re]) => re.test(category))?.[1] ?? ForkKnifeIcon
 }
 
-/* ----------------------------- Dietary tags ----------------------------- */
-
-export const DIETARY_TAGS = [
-  "vegetarian",
-  "vegan",
-  "gluten-free",
-  "dairy-free",
-  "nut-free",
-  "egg-free",
-  "spicy",
-  "kid-friendly",
-] as const
-
-export function normalizeTag(tag: string) {
-  return tag.trim().toLowerCase().replace(/\s+/g, "-")
-}
-
 /* ------------------------------ Event posters ----------------------------- */
 
 export interface PosterStyle {
