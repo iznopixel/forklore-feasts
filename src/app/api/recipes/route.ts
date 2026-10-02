@@ -1,17 +1,19 @@
 import { ApiError, check, handle, ok, readJson, requireUser, supabaseFor } from "@/server/supabase"
 import { sanitizeRecipe } from "@/server/validate"
 
-const WITH_EVENTS = "dishes (id, event_id, events (id, title, slug, starts_at))"
+const DISH_FIELDS = "id, event_id, is_winner, events (id, title, slug, starts_at)"
 
 export const GET = handle(async (req: Request) => {
   const sb = supabaseFor(req)
   const p = new URL(req.url).searchParams
   const eventId = p.get("event")
-  // `!inner` makes the event filter apply to the parent recipe rows
+  const winnersOnly = p.get("winner") === "1"
+  // `!inner` makes the dish filters apply to the parent recipe rows
   let q = sb
     .from("recipes")
-    .select(eventId ? "*, dishes!inner (id, event_id, events (id, title, slug, starts_at))" : `*, ${WITH_EVENTS}`)
+    .select(eventId || winnersOnly ? `*, dishes!inner (${DISH_FIELDS})` : `*, dishes (${DISH_FIELDS})`)
   if (eventId) q = q.eq("dishes.event_id", eventId)
+  if (winnersOnly) q = q.eq("dishes.is_winner", true)
   if (p.get("category")) q = q.eq("category", p.get("category")!)
   if (p.get("tag")) q = q.contains("tags", [p.get("tag")!])
   if (p.get("contributor")) q = q.eq("contributor_name", p.get("contributor")!)

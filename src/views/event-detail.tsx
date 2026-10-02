@@ -12,7 +12,7 @@ import {
   TrashIcon,
 } from "@phosphor-icons/react"
 import { DishDialog } from "@/components/cookbook/dish-dialog"
-import { Annotation, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
+import { Annotation, Crown, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import { ThemeVote } from "@/components/cookbook/theme-vote"
 import {
@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { deleteDish, fetchEventBySlug } from "@/lib/api"
+import { deleteDish, fetchEventBySlug, setDishWinner } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import { distinctRecipeCount, isUpcoming, longDate, monthDay, timeOfDay } from "@/lib/format"
 import { categoryIcon, posterStyle } from "@/lib/taxonomy"
@@ -39,7 +39,7 @@ import { cn } from "@/lib/utils"
 export default function EventDetailPage() {
   const { slug = "" } = useParams<{ slug?: string }>()
   const router = useRouter()
-  const { userId } = useAuth()
+  const { userId, isGuest } = useAuth()
   const { data: event, error, loading, reload } = useAsync(() => fetchEventBySlug(slug), [slug, userId])
 
   const [dishDialog, setDishDialog] = useState<{ open: boolean; dish: Dish | null }>({ open: false, dish: null })
@@ -68,6 +68,20 @@ export default function EventDetailPage() {
   const cover = mediaUrl(event.cover_image_path)
   const recipeCount = distinctRecipeCount(event.dishes)
   const voting = event.theme_voting
+
+  const isHost = !isGuest && !!userId && event.host_user_id === userId
+  // Winners take the head of the table; everyone else keeps the order they arrived in.
+  const dishes = [...event.dishes].sort((a, b) => Number(b.is_winner) - Number(a.is_winner))
+
+  async function toggleWinner(dish: DishWithRecipe) {
+    try {
+      await setDishWinner(dish.id, !dish.is_winner)
+      toast.success(dish.is_winner ? "Crown taken back." : `${dish.name} wears the crown.`)
+      reload()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn’t update the crown.")
+    }
+  }
 
   const openAdd = () => setDishDialog({ open: true, dish: null })
 
@@ -202,12 +216,14 @@ export default function EventDetailPage() {
             </EmptyNote>
           ) : (
             <ul className="grid gap-6 md:grid-cols-2">
-              {event.dishes.map((dish) => (
+              {dishes.map((dish) => (
                 <DishItem
                   key={dish.id}
                   dish={dish}
                   eventSlug={event.slug}
                   mine={!!userId && dish.owner_user_id === userId}
+                  canCrown={isHost}
+                  onToggleWinner={() => void toggleWinner(dish)}
                   onEdit={() => setDishDialog({ open: true, dish })}
                   onDelete={() => setToDelete(dish)}
                 />
@@ -252,25 +268,34 @@ function DishItem({
   dish,
   eventSlug,
   mine,
+  canCrown,
+  onToggleWinner,
   onEdit,
   onDelete,
 }: {
   dish: DishWithRecipe
   eventSlug: string
   mine: boolean
+  canCrown: boolean
+  onToggleWinner: () => void
   onEdit: () => void
   onDelete: () => void
 }) {
   const Icon = categoryIcon(dish.category)
   const recipe = dish.recipes
   return (
-    <li className={cn("paper relative flex gap-4 p-5", mine && "border-l-[5px] border-l-moss")}>
+    <li className={cn("paper relative flex gap-4 p-5", mine && "border-l-[5px] border-l-moss", dish.is_winner && "ring-1 ring-ochre/60")}>
       <div className="grid size-10 shrink-0 place-items-center rounded-full border border-tomato/50 text-tomato">
         <Icon weight="regular" className="size-5" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           {dish.category && <Badge variant="outline" className="border-moss/70 text-moss">{dish.category}</Badge>}
+          {dish.is_winner && (
+            <Badge variant="outline" className="border-ochre/70 text-ochre">
+              <Crown className="size-3.5" /> Winner
+            </Badge>
+          )}
           {mine && <Badge variant="secondary">Yours</Badge>}
         </div>
         <h3 className="mt-1 font-heading text-2xl leading-tight font-bold">{dish.name}</h3>
@@ -293,6 +318,11 @@ function DishItem({
             </Link>
           ) : (
             <span className="font-hand text-xl text-muted-foreground">recipe not written down yet</span>
+          )}
+          {canCrown && (
+            <Button variant="ghost" size="sm" onClick={onToggleWinner} aria-pressed={dish.is_winner}>
+              <Crown className="size-4" /> {dish.is_winner ? "Uncrown" : "Crown a winner"}
+            </Button>
           )}
           {mine && (
             <>

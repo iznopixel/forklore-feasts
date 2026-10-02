@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { EnvelopeSimpleIcon, PencilSimpleIcon, PlusIcon, SignOutIcon, TrashIcon } from "@phosphor-icons/react"
+import { EnvelopeSimpleIcon, KeyIcon, PencilSimpleIcon, PlusIcon, SignOutIcon, TrashIcon } from "@phosphor-icons/react"
 import { FormField } from "@/components/cookbook/form-field"
 import { SectionHeader } from "@/components/cookbook/ornaments"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
@@ -15,8 +15,10 @@ import { shortDate, timeOfDay } from "@/lib/format"
 import { useAsync } from "@/lib/use-async"
 
 function SignInCard() {
-  const { sendHostLink } = useAuth()
+  const { sendHostLink, signInWithPassword } = useAuth()
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [mode, setMode] = useState<"password" | "link">("password")
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -26,12 +28,16 @@ function SignInCard() {
     const value = email.trim().toLowerCase()
     if (!/^\S+@\S+\.\S+$/.test(value)) return setError("Enter your email address.")
     setError(null)
+    if (mode === "password" && !password) return setError("Enter your password.")
     setSending(true)
     try {
-      await sendHostLink(value)
-      setSent(true)
+      if (mode === "password") await signInWithPassword(value, password)
+      else {
+        await sendHostLink(value)
+        setSent(true)
+      }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn’t send the link.")
+      setError(e instanceof Error ? e.message : mode === "password" ? "Couldn’t sign you in." : "Couldn’t send the link.")
     } finally {
       setSending(false)
     }
@@ -54,7 +60,7 @@ function SignInCard() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="index-card mx-auto mt-8 grid max-w-md gap-5 p-6" style={{ backgroundImage: "none" }}>
-      <FormField id="host-email" label="Email" required error={error} hint="New here? Same step: we’ll email a one-time link, then you can request host access. No password needed.">
+      <FormField id="host-email" label="Email" required error={error} hint={mode === "link" ? "New here? Same step: we’ll email a one-time link, then you can request host access. You can set a password once you’re in." : undefined}>
         <Input
           id="host-email"
           type="email"
@@ -64,9 +70,31 @@ function SignInCard() {
           onChange={(e) => setEmail(e.target.value)}
         />
       </FormField>
+      {mode === "password" && (
+        <FormField id="host-password" label="Password" required>
+          <Input
+            id="host-password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </FormField>
+      )}
       <Button type="submit" disabled={sending}>
-        <EnvelopeSimpleIcon weight="bold" /> {sending ? "Sending…" : "Email me a sign-in link"}
+        {mode === "password" ? <KeyIcon weight="bold" /> : <EnvelopeSimpleIcon weight="bold" />}{" "}
+        {mode === "password" ? (sending ? "Signing in…" : "Sign in") : sending ? "Sending…" : "Email me a sign-in link"}
       </Button>
+      <button
+        type="button"
+        className="text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-tomato"
+        onClick={() => {
+          setError(null)
+          setMode(mode === "password" ? "link" : "password")
+        }}
+      >
+        {mode === "password" ? "No password yet? Email me a link instead" : "I have a password"}
+      </button>
     </form>
   )
 }
@@ -101,6 +129,57 @@ function RequestCard({ email, onDone }: { email: string | null; onDone: () => vo
         <Input id="host-name" value={name} maxLength={100} aria-invalid={Boolean(error)} onChange={(e) => setName(e.target.value)} />
       </FormField>
       <Button type="submit" disabled={sending}>{sending ? "Sending…" : "Request access"}</Button>
+    </form>
+  )
+}
+
+function PasswordCard() {
+  const { setPassword } = useAuth()
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  async function onSubmit(ev: FormEvent) {
+    ev.preventDefault()
+    if (value.length < 8) return setError("Use at least 8 characters.")
+    setError(null)
+    setSaving(true)
+    try {
+      await setPassword(value)
+      toast.success("Password saved. You can sign in with it next time.")
+      setValue("")
+      setOpen(false)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn’t save that password.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!open) {
+    return (
+      <Button variant="ghost" size="sm" className="mt-4" onClick={() => setOpen(true)}>
+        <KeyIcon weight="bold" /> Set a password
+      </Button>
+    )
+  }
+  return (
+    <form onSubmit={onSubmit} noValidate className="index-card mt-4 grid max-w-md gap-4 p-5" style={{ backgroundImage: "none" }}>
+      <FormField id="host-new-password" label="New password" error={error} hint="At least 8 characters.">
+        <Input
+          id="host-new-password"
+          type="password"
+          autoComplete="new-password"
+          value={value}
+          aria-invalid={Boolean(error)}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </FormField>
+      <div className="flex gap-2">
+        <Button type="submit" disabled={saving}>{saving ? "Saving…" : "Save password"}</Button>
+        <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+      </div>
     </form>
   )
 }
@@ -203,6 +282,7 @@ export default function HostPage() {
               </Button>
             </div>
           </div>
+          <PasswordCard />
           <Dashboard userId={userId} />
         </>
       )}

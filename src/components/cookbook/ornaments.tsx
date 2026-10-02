@@ -106,3 +106,13 @@ export function Stamp({
     </div>
   )
 }
+
+/** A simple three-point crown, for dishes voted the winners of a gathering. */
+export function Crown({ className, ...props }: ComponentProps<"svg">) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className} {...props}>
+      <path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5L3 8z" />
+      <rect x="5" y="19.5" width="14" height="1.8" rx="0.9" />
+    </svg>
+  )
+}
