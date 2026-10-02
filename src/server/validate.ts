@@ -77,3 +77,36 @@ export function sanitizeEvent(body: Raw) {
   if ("cover_image_path" in body) out.cover_image_path = optStr(body.cover_image_path, 300)
   return out
 }
+
+/**
+ * Theme voting settings from the event form, or undefined when the body doesn't mention them.
+ * The database re-checks all of this; failing early just gives friendlier errors.
+ */
+export function sanitizeThemeVoting(body: Raw, startsAt: string) {
+  const raw = body.theme_voting
+  if (raw === undefined) return undefined
+  const tv = (raw && typeof raw === "object" ? raw : {}) as Raw
+  if (tv.enabled !== true) return { enabled: false, deadline: null, options: [] }
+  const deadline = typeof tv.deadline === "string" ? new Date(tv.deadline) : null
+  if (!deadline || Number.isNaN(deadline.getTime())) throw new ApiError(400, "Pick a voting deadline.")
+  if (deadline.getTime() <= Date.now()) throw new ApiError(400, "The voting deadline needs to be in the future.")
+  if (deadline.getTime() > new Date(startsAt).getTime()) throw new ApiError(400, "Voting should close before the gathering starts.")
+  const options = Array.isArray(tv.options) ? tv.options : []
+  if (options.length < 2 || options.length > 3) throw new ApiError(400, "Offer two or three themes to vote on.")
+  return {
+    enabled: true,
+    deadline: deadline.toISOString(),
+    options: options.map((o: Raw) => {
+      const name = str(o?.name, 60)
+      if (!name) throw new ApiError(400, "Every theme needs a name.")
+      return { id: optStr(o.id, 64), name, description: optStr(o.description, 140) }
+    }),
+  }
+}
+
+/** Voter's first name, trimmed and with runs of spaces collapsed. */
+export function sanitizeVoterName(v: unknown) {
+  const name = str(v, 200).replace(/\s+/g, " ")
+  if (!name || name.length > 40) throw new ApiError(400, "Add your first name (40 characters or fewer) to vote.")
+  return name
+}

@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { Crown } from "@/components/cookbook/ornaments"
+import { isWinningRecipe } from "@/lib/format"
 import { mediaUrl } from "@/lib/supabase"
 import type { RecipeWithEvents } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -15,6 +17,7 @@ const TILTS = [
 /** A recipe written out by hand on an index card. */
 export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; index?: number }) {
   const image = mediaUrl(recipe.image_path)
+  const winner = isWinningRecipe(recipe)
 
   return (
     <Link
@@ -24,6 +27,16 @@ export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; in
         TILTS[index % TILTS.length]
       )}
     >
+      {winner && (
+        <span
+          role="img"
+          aria-label="Voted a winner"
+          title="Voted a winner"
+          className="absolute -top-3 -right-2 z-10 grid size-9 rotate-6 place-items-center rounded-full border border-ochre/70 bg-[#f8f1e1] text-ochre shadow-[0_2px_5px_rgb(60_40_20/0.25)]"
+        >
+          <Crown className="size-5" />
+        </span>
+      )}
       {image && (
         <div className="relative m-3 mb-0 aspect-[4/3] overflow-hidden border border-border bg-muted">
           <img src={image} alt="" loading="lazy" className="size-full object-cover sepia-[0.15]" />

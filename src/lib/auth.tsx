@@ -28,6 +28,12 @@ interface AuthValue {
   ensureSession: () => Promise<Session | null>
   /** Emails a one-time sign-in link for hosts. Throws with a readable message on failure. */
   sendHostLink: (email: string) => Promise<void>
+  /** Emails a password-reset link that lands on /host/reset. Doesn't reveal whether the address has an account. */
+  sendPasswordReset: (email: string) => Promise<void>
+  /** Signs a host in with email + password. Throws with a readable message on failure. */
+  signInWithPassword: (email: string, password: string) => Promise<void>
+  /** Sets (or changes) the signed-in host's password. */
+  setPassword: (password: string) => Promise<void>
   /** Signs out and drops back to a fresh guest session. */
   signOut: () => Promise<void>
 }
@@ -95,6 +101,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (otpError) throw new Error(otpError.message)
   }, [])
 
+  const sendPasswordReset = useCallback(async (email: string) => {
+    let captchaToken: string | undefined
+    try {
+      captchaToken = await getCaptchaToken()
+    } catch (e) {
+      throw new Error(e instanceof Error ? e.message : "Captcha check failed.")
+    }
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/host/reset`,
+      ...(captchaToken ? { captchaToken } : {}),
+    })
+    if (resetError) throw new Error(resetError.message)
+  }, [])
+
+  const signInWithPassword = useCallback(async (email: string, password: string) => {
+    let captchaToken: string | undefined
+    try {
+      captchaToken = await getCaptchaToken()
+    } catch (e) {
+      throw new Error(e instanceof Error ? e.message : "Captcha check failed.")
+    }
+    const { error: pwError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      ...(captchaToken ? { options: { captchaToken } } : {}),
+    })
+    if (pwError) {
+      throw new Error(/invalid login/i.test(pwError.message) ? "That email and password don’t match." : pwError.message)
+    }
+  }, [])
+
+  const setPassword = useCallback(async (password: string) => {
+    const { error: updateError } = await supabase.auth.updateUser({ password })
+    if (updateError) throw new Error(updateError.message)
+  }, [])
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut()
     setSession(null)
@@ -123,9 +165,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: session?.user.email ?? null,
       ensureSession,
       sendHostLink,
+      sendPasswordReset,
+      signInWithPassword,
+      setPassword,
       signOut,
     }),
-    [status, session, error, ensureSession, sendHostLink, signOut]
+    [status, session, error, ensureSession, sendHostLink, sendPasswordReset, signInWithPassword, setPassword, signOut]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

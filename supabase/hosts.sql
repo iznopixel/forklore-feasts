@@ -15,6 +15,19 @@ alter table public.hosts add column if not exists status text not null default '
 alter table public.hosts alter column status set default 'pending';
 alter table public.hosts enable row level security;  -- no policies: reachable only via the functions below and by admins
 
+-- True when the signed-in user has proven they own their email (magic link, or a confirmed password sign-up).
+-- Read from auth.users, not the token, so a password sign-up with someone else's address can't pass as them.
+create or replace function public.email_is_confirmed()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from auth.users u where u.id = auth.uid() and u.email_confirmed_at is not null);
+$$;
+grant execute on function public.email_is_confirmed() to authenticated;
+
 -- 2. True for a signed-in, non-anonymous user whose verified email is an approved host.
 create or replace function public.is_host()
 returns boolean
@@ -24,6 +37,7 @@ security definer
 set search_path = public
 as $$
   select coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) = false
+     and public.email_is_confirmed()
      and exists (
        select 1 from public.hosts h
        where h.email = lower(auth.jwt() ->> 'email') and h.status = 'approved'
@@ -39,10 +53,10 @@ stable
 security definer
 set search_path = public
 as $$
-  select coalesce(
+  select case when public.email_is_confirmed() then coalesce(
     (select h.status from public.hosts h where h.email = lower(auth.jwt() ->> 'email')),
     'none'
-  );
+  ) else 'none' end;
 $$;
 grant execute on function public.my_host_status() to authenticated;
 
@@ -56,6 +70,9 @@ as $$
 begin
   if coalesce((auth.jwt() ->> 'is_anonymous')::boolean, true) or (auth.jwt() ->> 'email') is null then
     raise exception 'Sign in with your email first' using errcode = '42501';
+  end if;
+  if not public.email_is_confirmed() then
+    raise exception 'Confirm your email first: open the link we sent when you created your password.' using errcode = '42501';
   end if;
   insert into public.hosts (email, name)
   values (lower(auth.jwt() ->> 'email'), nullif(trim(p_name), ''))

@@ -31,6 +31,8 @@ Browser ──fetch──▶ Next.js /api/* route handlers ──▶ Supabase (P
 | `GET/POST /api/dishes`, `PATCH/DELETE /api/dishes/[id]` | |
 | `POST /api/events`, `PATCH/DELETE /api/events/[id]` | hosts only (see below), own events via RLS |
 | `GET/POST /api/host/me` | host status (`none`/`pending`/`approved`); POST requests access |
+| `POST /api/events/[id]/vote` | a guest votes on the theme (`option_id`, `first_name`); same first name replaces the earlier vote |
+| `POST /api/events/[id]/theme` | host breaks a tie by choosing the final theme |
 | `POST /api/uploads` | image → `forklore-media/<user-id>/<file>`; returns the object path |
 
 `owner_user_id` and slugs are never sent; the database fills them. Only the publishable key is used.
@@ -44,5 +46,10 @@ To protect guest sign-in from bots, create a Cloudflare Turnstile widget, put it
 - **Authentication → Sign In / Providers → Anonymous sign-ins must be enabled.** Until it is, the site is browsable but saving shows a friendly notice.
 - `supabase/seed.sql` adds a few example events (admin-run, bypasses RLS).
 - **Hosts:** run `supabase/hosts.sql` once. Anyone can go to `/host`, sign in with an emailed link (Auth → Email must be enabled; add your site URL + `/host` to Auth → URL Configuration redirect URLs) and request host access. Requests land as `pending`; approve with `update public.hosts set status = 'approved' where email = '...';` (list pending ones with `select * from public.hosts where status = 'pending'`). Approved hosts can create, edit and delete their own gatherings, including a cover photo. Guests stay anonymous and can't touch events.
+
+- **Theme voting:** run `supabase/theme-voting.sql` once (after `hosts.sql`). Hosts can switch on "Allow guests to vote on the theme" when creating or editing a gathering (2–3 themes plus a deadline, which must come before the gathering starts). Guests vote anonymously with a first name; votes live in `theme_votes` and are only reachable through the functions in that file. Totals are visible to the host straight away and to everyone once voting closes. The form can set the deadline to the Sunday night after the host's previous gathering (worked out when you save, so re-save if that gathering moves). At the deadline a `pg_cron` job (enabled in Database → Extensions, scheduled by the SQL file, runs every minute) closes the vote and makes the top option the theme; without `pg_cron`, the first page view after the deadline does it. On a tie (or no votes) the host picks from the tied options. Once voting has closed, its options and deadline are locked.
+
+- **Host passwords:** hosts can sign in with email + password, set one from the host corner after a first email link, or use "Forgot your password?". Add every site URL's `/host/reset` (and `/host`) to Auth → URL Configuration → Redirect URLs, for each environment (localhost, preview, production; a wildcard like `https://*-yourteam.vercel.app/**` covers Vercel previews). Re-run `supabase/hosts.sql` after pulling this: host checks now require a confirmed email, so a password sign-up with someone else's address can't pass as them. Keep Auth → Email → "Confirm email" on.
+- **Winners:** run `supabase/winners.sql` once (after `hosts.sql`). Hosts then see a “Crown a winner” button on each dish at their own gatherings; crowned dishes get a crown on their recipe cards, sort first on the event page, and can be filtered with the “Winners” chip on `/recipes`.
 
 Layout: `src/app` (routes + API), `src/server` (Supabase helpers), `src/views` (page UIs), `src/components/cookbook` (poster, cards, ornaments), `src/components/ui` (shadcn).
