@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { format } from "date-fns"
+import { endOfDay, format, nextSunday } from "date-fns"
 import { toast } from "sonner"
 import { ArrowLeftIcon, CameraIcon, PlusIcon, XIcon } from "@phosphor-icons/react"
 import { FormField } from "@/components/cookbook/form-field"
@@ -13,8 +13,9 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { createEvent, fetchEventBySlug, fetchHostStatus, updateEvent, uploadImage } from "@/lib/api"
+import { createEvent, fetchEventBySlug, fetchHostStatus, fetchMyEvents, updateEvent, uploadImage } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
+import { longDate, timeOfDay } from "@/lib/format"
 import { mediaUrl } from "@/lib/supabase"
 import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
@@ -38,6 +39,7 @@ export default function EventFormPage() {
   const signedIn = status === "ready" && !isGuest && Boolean(userId)
 
   const host = useAsync(async () => (signedIn ? (await fetchHostStatus()).isHost : false), [signedIn, userId])
+  const mine = useAsync(async () => (signedIn && host.data ? fetchMyEvents() : []), [signedIn, host.data, userId])
   const existing = useAsync(async () => (slug ? fetchEventBySlug(slug) : null), [slug])
 
   const [title, setTitle] = useState("")
@@ -51,6 +53,8 @@ export default function EventFormPage() {
   const [voting, setVoting] = useState(false)
   const [themes, setThemes] = useState<ThemeDraft[]>(blankThemes)
   const [deadline, setDeadline] = useState("")
+  // "after": close the Sunday after the previous gathering; "custom": a date and time of the host's choosing
+  const [deadlineMode, setDeadlineMode] = useState<"after" | "custom">("after")
   const [errors, setErrors] = useState<{ title?: string; starts?: string; image?: string; themes?: string; deadline?: string }>({})
   const [saving, setSaving] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -68,10 +72,24 @@ export default function EventFormPage() {
     if (e.theme_voting_enabled && e.theme_voting_deadline) {
       setVoting(true)
       setDeadline(format(new Date(e.theme_voting_deadline), "yyyy-MM-dd'T'HH:mm"))
+      setDeadlineMode("custom")
       const saved = e.theme_voting?.options ?? []
       if (saved.length) setThemes(saved.map((o) => ({ id: o.id, name: o.name, description: o.description ?? "" })))
     }
   }, [existing.data])
+
+  // The gathering just before this one, and the Sunday night after it: when voting for this one can close.
+  const startDate = startsAt ? new Date(startsAt) : null
+  const previous =
+    startDate && !Number.isNaN(startDate.getTime())
+      ? (mine.data ?? [])
+          .filter((ev) => ev.id !== existing.data?.id && new Date(ev.starts_at) < startDate)
+          .sort((a, b) => b.starts_at.localeCompare(a.starts_at))[0] ?? null
+      : null
+  const sundayClose = previous ? endOfDay(nextSunday(new Date(previous.starts_at))) : null
+  const sundayUsable = Boolean(sundayClose && sundayClose.getTime() > Date.now() && startDate && sundayClose < startDate)
+  const useSunday = deadlineMode === "after" && sundayUsable
+  const deadlineDate = useSunday ? sundayClose : deadline ? new Date(deadline) : null
 
   // Once the deadline has passed the options and deadline are locked (the votes are the record).
   const votingLocked = Boolean(existing.data?.theme_voting && existing.data.theme_voting.status !== "open")
@@ -102,10 +120,10 @@ export default function EventFormPage() {
     if (!title.trim()) found.title = "Give the gathering a title."
     if (!startsAt || Number.isNaN(new Date(startsAt).getTime())) found.starts = "Pick a date and time."
     if (voting && !votingLocked) {
-      const d = new Date(deadline)
-      if (!deadline || Number.isNaN(d.getTime())) found.deadline = "Pick when voting closes."
+      const d = deadlineDate ?? new Date(NaN)
+      if (Number.isNaN(d.getTime())) found.deadline = "Pick when voting closes."
       else if (d.getTime() <= Date.now()) found.deadline = "That’s already past. Pick a time ahead."
-      else if (!found.starts && d.getTime() > new Date(startsAt).getTime()) found.deadline = "Voting should close before the gathering starts."
+      else if (!found.starts && d.getTime() > startDate!.getTime()) found.deadline = "Voting should close before the gathering starts."
       if (themes.some((t) => !t.name.trim())) found.themes = "Give every theme a name, or remove the extra one."
     }
     setErrors((cur) => ({ image: cur.image, ...found }))
@@ -130,7 +148,7 @@ export default function EventFormPage() {
           : {
               theme_voting: {
                 enabled: voting,
-                deadline: voting ? new Date(deadline).toISOString() : null,
+                deadline: voting && deadlineDate ? deadlineDate.toISOString() : null,
                 options: voting ? themes.map((t) => ({ id: t.id, name: t.name.trim(), description: t.description.trim() || null })) : [],
               },
             }),
@@ -260,9 +278,47 @@ export default function EventFormPage() {
                     </Button>
                   </div>
                 )}
-                <FormField id="ef-deadline" label="Voting closes" required error={errors.deadline} hint="Before the gathering starts. After this, the top theme is chosen. If it’s a tie, you’ll pick.">
-                  <Input id="ef-deadline" type="datetime-local" value={deadline} aria-invalid={Boolean(errors.deadline)} onChange={(e) => setDeadline(e.target.value)} />
-                </FormField>
+                <fieldset className="grid gap-2">
+                  <legend className="mb-1 text-[0.8rem] font-bold tracking-[0.1em] uppercase">Voting closes</legend>
+                  {sundayUsable && previous && sundayClose && (
+                    <>
+                      {[
+                        {
+                          value: "after" as const,
+                          label: `Sunday after ${previous.title}`,
+                          hint: `${longDate(sundayClose.toISOString())}, ${timeOfDay(sundayClose.toISOString())}. The winning theme goes up right then.`,
+                        },
+                        { value: "custom" as const, label: "Pick my own date and time", hint: "" },
+                      ].map((o) => (
+                        <label key={o.value} className="flex cursor-pointer items-start gap-3">
+                          <input
+                            type="radio"
+                            name="ef-deadline-mode"
+                            className="mt-1.5 accent-tomato"
+                            checked={useSunday ? o.value === "after" : o.value === "custom"}
+                            onChange={() => setDeadlineMode(o.value)}
+                          />
+                          <span>
+                            <span className="block font-semibold">{o.label}</span>
+                            {o.hint && <span className="block text-sm text-muted-foreground">{o.hint}</span>}
+                          </span>
+                        </label>
+                      ))}
+                    </>
+                  )}
+                  {!useSunday && (
+                    <FormField
+                      id="ef-deadline"
+                      label="Date & time"
+                      required
+                      error={errors.deadline}
+                      hint="Before the gathering starts. When it passes, the top theme is chosen. If it’s a tie, you’ll pick."
+                    >
+                      <Input id="ef-deadline" type="datetime-local" value={deadline} aria-invalid={Boolean(errors.deadline)} onChange={(e) => setDeadline(e.target.value)} />
+                    </FormField>
+                  )}
+                  {useSunday && errors.deadline && <p role="alert" className="text-sm font-semibold text-destructive">{errors.deadline}</p>}
+                </fieldset>
               </div>
             )}
           </fieldset>

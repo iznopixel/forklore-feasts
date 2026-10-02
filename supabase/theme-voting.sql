@@ -358,5 +358,40 @@ end;
 $$;
 grant execute on function public.choose_theme_winner(uuid, uuid) to authenticated;
 
+-- 11. Close votes at the exact deadline: every minute, settle any vote whose deadline has passed
+--     (top option becomes the theme; a tie waits for the host). Needs the pg_cron extension
+--     (Supabase: Database -> Extensions -> pg_cron). Without it everything still works, but a vote only
+--     settles the next time someone opens the event or the events list.
+create or replace function public.theme_voting_settle_due()
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  due record;
+  n integer := 0;
+begin
+  for due in
+    select id from public.events
+    where theme_voting_enabled and theme_voting_status <> 'finalized' and theme_voting_deadline <= now()
+  loop
+    perform public.theme_voting_settle(due.id);
+    n := n + 1;
+  end loop;
+  return n;
+end;
+$$;
+revoke all on function public.theme_voting_settle_due() from public, anon, authenticated;
+
+do $$
+begin
+  create extension if not exists pg_cron;
+  perform cron.schedule('forklore-theme-voting', '* * * * *', 'select public.theme_voting_settle_due()');
+exception when others then
+  raise notice 'pg_cron is not available (%). Votes will settle when the event or events list is next opened.', sqlerrm;
+end;
+$$;
+
 -- Make the API pick up the new functions right away.
 notify pgrst, 'reload schema';
