@@ -14,11 +14,13 @@ import { useAuth } from "@/lib/auth"
 import { shortDate, timeOfDay } from "@/lib/format"
 import { useAsync } from "@/lib/use-async"
 
+const switchLink = "text-left text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-tomato"
+
 function SignInCard() {
-  const { sendHostLink, signInWithPassword } = useAuth()
+  const { sendHostLink, sendPasswordReset, signInWithPassword } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [mode, setMode] = useState<"password" | "link">("password")
+  const [mode, setMode] = useState<"password" | "link" | "reset">("password")
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -33,11 +35,11 @@ function SignInCard() {
     try {
       if (mode === "password") await signInWithPassword(value, password)
       else {
-        await sendHostLink(value)
+        await (mode === "reset" ? sendPasswordReset(value) : sendHostLink(value))
         setSent(true)
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : mode === "password" ? "Couldn’t sign you in." : "Couldn’t send the link.")
+      setError(e instanceof Error ? e.message : mode === "password" ? "Couldn’t sign you in." : "Couldn’t send the email.")
     } finally {
       setSending(false)
     }
@@ -49,7 +51,11 @@ function SignInCard() {
         <EnvelopeSimpleIcon weight="duotone" className="mx-auto mb-2 size-10 text-tomato" />
         <p className="font-heading text-xl font-bold">Check your inbox</p>
         <p className="mt-1 text-muted-foreground">
-          We sent a sign-in link to <strong>{email.trim()}</strong>. Open it on this device to continue.
+          {mode === "reset" ? (
+            <>If <strong>{email.trim()}</strong> has a host account, a link to choose a new password is on its way. Open it on this device.</>
+          ) : (
+            <>We sent a sign-in link to <strong>{email.trim()}</strong>. Open it on this device to continue.</>
+          )}
         </p>
         <Button variant="outline" size="sm" className="mt-4" onClick={() => setSent(false)}>
           Use a different email
@@ -60,7 +66,7 @@ function SignInCard() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="index-card mx-auto mt-8 grid max-w-md gap-5 p-6" style={{ backgroundImage: "none" }}>
-      <FormField id="host-email" label="Email" required error={error} hint={mode === "link" ? "New here? Same step: we’ll email a one-time link, then you can request host access. You can set a password once you’re in." : undefined}>
+      <FormField id="host-email" label="Email" required error={error} hint={mode === "reset" ? "We’ll email you a link to choose a new password." : mode === "link" ? "New here? Same step: we’ll email a one-time link, then you can request host access. You can set a password once you’re in." : undefined}>
         <Input
           id="host-email"
           type="email"
@@ -83,18 +89,22 @@ function SignInCard() {
       )}
       <Button type="submit" disabled={sending}>
         {mode === "password" ? <KeyIcon weight="bold" /> : <EnvelopeSimpleIcon weight="bold" />}{" "}
-        {mode === "password" ? (sending ? "Signing in…" : "Sign in") : sending ? "Sending…" : "Email me a sign-in link"}
+        {mode === "password"
+          ? sending ? "Signing in…" : "Sign in"
+          : mode === "reset"
+            ? sending ? "Sending…" : "Email me a reset link"
+            : sending ? "Sending…" : "Email me a sign-in link"}
       </Button>
-      <button
-        type="button"
-        className="text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-tomato"
-        onClick={() => {
-          setError(null)
-          setMode(mode === "password" ? "link" : "password")
-        }}
-      >
-        {mode === "password" ? "No password yet? Email me a link instead" : "I have a password"}
-      </button>
+      <div className="grid gap-2">
+        {mode === "password" && (
+          <button type="button" className={switchLink} onClick={() => { setError(null); setMode("reset") }}>
+            Forgot your password?
+          </button>
+        )}
+        <button type="button" className={switchLink} onClick={() => { setError(null); setMode(mode === "password" ? "link" : "password") }}>
+          {mode === "password" ? "No password yet? Email me a link instead" : "I have a password"}
+        </button>
+      </div>
     </form>
   )
 }

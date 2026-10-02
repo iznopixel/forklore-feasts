@@ -28,6 +28,8 @@ interface AuthValue {
   ensureSession: () => Promise<Session | null>
   /** Emails a one-time sign-in link for hosts. Throws with a readable message on failure. */
   sendHostLink: (email: string) => Promise<void>
+  /** Emails a password-reset link that lands on /host/reset. Doesn't reveal whether the address has an account. */
+  sendPasswordReset: (email: string) => Promise<void>
   /** Signs a host in with email + password. Throws with a readable message on failure. */
   signInWithPassword: (email: string, password: string) => Promise<void>
   /** Sets (or changes) the signed-in host's password. */
@@ -99,6 +101,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (otpError) throw new Error(otpError.message)
   }, [])
 
+  const sendPasswordReset = useCallback(async (email: string) => {
+    let captchaToken: string | undefined
+    try {
+      captchaToken = await getCaptchaToken()
+    } catch (e) {
+      throw new Error(e instanceof Error ? e.message : "Captcha check failed.")
+    }
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/host/reset`,
+      ...(captchaToken ? { captchaToken } : {}),
+    })
+    if (resetError) throw new Error(resetError.message)
+  }, [])
+
   const signInWithPassword = useCallback(async (email: string, password: string) => {
     let captchaToken: string | undefined
     try {
@@ -149,11 +165,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: session?.user.email ?? null,
       ensureSession,
       sendHostLink,
+      sendPasswordReset,
       signInWithPassword,
       setPassword,
       signOut,
     }),
-    [status, session, error, ensureSession, sendHostLink, signInWithPassword, setPassword, signOut]
+    [status, session, error, ensureSession, sendHostLink, sendPasswordReset, signInWithPassword, setPassword, signOut]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
