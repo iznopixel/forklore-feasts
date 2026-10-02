@@ -48,13 +48,6 @@ export function categoryIcon(category?: string | null): Icon {
   return CATEGORY_ICONS.find(([re]) => re.test(category))?.[1] ?? ForkKnifeIcon
 }
 
-/* -------------------------------- Tags -------------------------------- */
-
-/** Dietary tags are worked out from ingredients; see `@/lib/dietary`. */
-export function normalizeTag(tag: string) {
-  return tag.trim().toLowerCase().replace(/\s+/g, "-")
-}
-
 /* ------------------------------ Event posters ----------------------------- */
 
 export interface PosterStyle {

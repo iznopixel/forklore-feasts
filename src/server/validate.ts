@@ -1,5 +1,5 @@
 import "server-only"
-import { mergeTags } from "@/lib/dietary"
+import { inferDietaryTags } from "@/lib/dietary"
 import { ApiError } from "@/server/supabase"
 
 type Raw = Record<string, unknown>
@@ -12,7 +12,7 @@ const list = (v: unknown, max: number) =>
     : []
 const optInt = (v: unknown) => (Number.isInteger(v) && (v as number) > 0 ? (v as number) : null)
 
-/** Whitelists recipe fields — never trusts owner_user_id/slug/id/dietary tags from the client. */
+/** Whitelists recipe fields — never trusts owner_user_id/slug/id/tags from the client. */
 export function sanitizeRecipe(body: Raw) {
   const name = str(body.name, 200)
   const contributor_name = str(body.contributor_name, 100)
@@ -28,8 +28,8 @@ export function sanitizeRecipe(body: Raw) {
     category: optStr(body.category, 60),
     ingredients,
     instructions: list(body.instructions, 200),
-    // Dietary tags are worked out from the ingredients; the client only sends its own extras.
-    tags: mergeTags(ingredients, list(body.tags, 20).map((t) => t.toLowerCase())).slice(0, 20),
+    // Tags are worked out from the ingredients; the client can't set them.
+    tags: inferDietaryTags(ingredients),
     prep_time_minutes: optInt(body.prep_time_minutes),
     cook_time_minutes: optInt(body.cook_time_minutes),
     servings: optInt(body.servings),

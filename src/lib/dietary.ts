@@ -6,22 +6,6 @@
  * set aside before matching.
  */
 
-/** Tags this module owns. Anything else on a recipe is a cook's own tag. */
-export const AUTO_DIETARY_TAGS = [
-  "vegetarian",
-  "vegan",
-  "gluten-free",
-  "dairy-free",
-  "nut-free",
-  "peanut-free",
-  "shellfish-free",
-  "egg-free",
-  "spicy",
-] as const
-
-/** Tags a cook can still add by hand, since no ingredient list can tell us. */
-export const SUGGESTED_TAGS = ["kid-friendly"] as const
-
 const words = (list: string) => new RegExp(`\\b(?:${list})\\b`, "i")
 const strip = (list: string) => new RegExp(`\\b(?:${list})\\b`, "gi")
 
@@ -159,14 +143,4 @@ export function inferDietaryTags(ingredients: string[]): string[] {
   if (!egg) tags.push("egg-free")
   if (any((l) => SPICY.test(l))) tags.push("spicy")
   return tags
-}
-
-const isAuto = (t: string) => (AUTO_DIETARY_TAGS as readonly string[]).includes(t)
-
-/** The cook's own tags, with anything this module works out for itself removed. */
-export const customTags = (tags: string[]) => tags.filter((t) => !isAuto(t))
-
-/** Final tag list for a recipe: worked-out dietary tags plus the cook's own. */
-export function mergeTags(ingredients: string[], extra: string[]): string[] {
-  return [...new Set([...inferDietaryTags(ingredients), ...customTags(extra)])]
 }
