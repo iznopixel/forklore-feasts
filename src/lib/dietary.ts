@@ -13,6 +13,8 @@ export const AUTO_DIETARY_TAGS = [
   "gluten-free",
   "dairy-free",
   "nut-free",
+  "peanut-free",
+  "shellfish-free",
   "egg-free",
   "spicy",
 ] as const
@@ -24,7 +26,7 @@ const words = (list: string) => new RegExp(`\\b(?:${list})\\b`, "i")
 const strip = (list: string) => new RegExp(`\\b(?:${list})\\b`, "gi")
 
 /** "gluten-free flour", "vegan butter"… the qualifier and the word after it. */
-const QUALIFIED = /\b(?:gluten|dairy|egg|nut|lactose)[- ]free\s+\w+|\bvegan\s+\w+/gi
+const QUALIFIED = /\b(?:gluten|dairy|egg|nut|peanut|shellfish|lactose)[- ]free\s+\w+|\bvegan\s+\w+/gi
 
 interface Rule {
   match: RegExp
@@ -71,6 +73,19 @@ const DAIRY: Rule = {
 const EGG: Rule = {
   match: words("eggs?|mayo(?:nnaise)?|aioli|meringue|brioche"),
   safe: strip("eggplants?|egg replacer"),
+}
+
+const SHELLFISH: Rule = {
+  match: words(
+    "shellfish|shrimps?|prawns?|crab|lobster|crawfish|crayfish|clams?|mussels?|oysters?|scallops?|squid|calamari|seafood|krill"
+  ),
+  safe: strip("oyster mushrooms?|crab apples?"),
+}
+
+/** Generic "nuts" count too: when it isn't clear which nut, assume peanuts. */
+const PEANUTS: Rule = {
+  match: words("peanuts?|groundnuts?|satay|nuts?"),
+  safe: strip("pine nuts?|water chestnuts?|butternut"),
 }
 
 const HONEY = words("honey")
@@ -139,6 +154,8 @@ export function inferDietaryTags(ingredients: string[]): string[] {
   if (!any((l) => hits(GLUTEN, l))) tags.push("gluten-free")
   if (!dairy) tags.push("dairy-free")
   if (!any((l) => hits(NUTS, l))) tags.push("nut-free")
+  if (!any((l) => hits(PEANUTS, l))) tags.push("peanut-free")
+  if (!any((l) => hits(SHELLFISH, l))) tags.push("shellfish-free")
   if (!egg) tags.push("egg-free")
   if (any((l) => SPICY.test(l))) tags.push("spicy")
   return tags
