@@ -8,6 +8,7 @@ import {
   ArrowLeftIcon,
   CameraIcon,
   CookingPotIcon,
+  LinkIcon,
   XIcon,
 } from "@phosphor-icons/react"
 import { FormField } from "@/components/cookbook/form-field"
@@ -25,6 +26,8 @@ import {
   fetchEvents,
   fetchMyDishesForEvent,
   fetchRecipeBySlug,
+  importRecipe,
+  type ImportedRecipe,
   updateDish,
   updateRecipe,
   uploadImage,
@@ -61,6 +64,7 @@ interface Errors {
   ingredients?: string
   instructions?: string
   source?: string
+  link?: string
   image?: string
 }
 
@@ -93,6 +97,8 @@ export default function RecipeFormPage() {
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [keepImage, setKeepImage] = useState(true)
+  const [link, setLink] = useState("")
+  const [importing, setImporting] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
   const [saving, setSaving] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -188,6 +194,44 @@ export default function RecipeFormPage() {
     setFile(f)
   }
 
+  function applyImported(r: ImportedRecipe) {
+    setName(r.name)
+    setDescription(r.description ?? "")
+    setIngredients(r.ingredients.join("\n"))
+    setInstructions(r.instructions.join("\n"))
+    setPrep(r.prep_time_minutes?.toString() ?? "")
+    setCook(r.cook_time_minutes?.toString() ?? "")
+    setServings(r.servings?.toString() ?? "")
+    setSource(r.source_url ?? "")
+  }
+
+  function linkError(): string | undefined {
+    try {
+      const u = new URL(link.trim())
+      if (/^https?:$/.test(u.protocol)) return undefined
+    } catch {
+      /* fall through */
+    }
+    return "That doesn’t look like a web address (start with https://)."
+  }
+
+  async function onImport() {
+    const bad = linkError()
+    setErrors((cur) => ({ ...cur, link: bad }))
+    if (bad) return
+    setImporting(true)
+    try {
+      const uid = await requireUser()
+      if (!uid) return
+      applyImported(await importRecipe(link.trim()))
+      toast.success("Got it. Give it a once-over, add your name and save.")
+    } catch (err) {
+      setErrors((cur) => ({ ...cur, link: err instanceof Error ? err.message : "Couldn’t read that page." }))
+    } finally {
+      setImporting(false)
+    }
+  }
+
   function validate(): Errors {
     const e: Errors = {}
     if (!name.trim()) e.name = "Every recipe needs a name."
@@ -207,7 +251,29 @@ export default function RecipeFormPage() {
 
   async function onSubmit(ev: FormEvent) {
     ev.preventDefault()
-    const found = validate()
+    // A pasted link with nothing else filled in: read the page as part of saving
+    const linkOnly = !editing && link.trim() && !ingredients.trim() && !instructions.trim()
+    let imported: ImportedRecipe | null = null
+    if (linkOnly) {
+      const bad = linkError()
+      if (bad || !who.trim()) {
+        setErrors((cur) => ({ image: cur.image, link: bad, who: who.trim() ? undefined : "Add your name so the cook gets credit." }))
+        document.querySelector<HTMLElement>("[aria-invalid=true]")?.focus()
+        return
+      }
+      setSaving(true)
+      try {
+        const uid = await requireUser()
+        if (!uid) return
+        imported = await importRecipe(link.trim())
+        applyImported(imported)
+      } catch (err) {
+        setErrors((cur) => ({ ...cur, link: err instanceof Error ? err.message : "Couldn’t read that page." }))
+        setSaving(false)
+        return
+      }
+    }
+    const found = imported ? {} : validate()
     setErrors((cur) => ({ image: cur.image, ...found }))
     if (Object.keys(found).length) {
       toast.error("A few things need your attention.")
@@ -225,16 +291,16 @@ export default function RecipeFormPage() {
       else if (editing && !keepImage) image_path = null
 
       const input: RecipeInput = {
-        name: name.trim(),
+        name: (imported?.name ?? name).trim(),
         contributor_name: who.trim(),
-        description: description.trim() || null,
+        description: (imported ? imported.description ?? "" : description).trim() || null,
         category: category || null,
-        ingredients: toList(ingredients),
-        instructions: toList(instructions),
-        prep_time_minutes: toInt(prep),
-        cook_time_minutes: toInt(cook),
-        servings: toInt(servings),
-        source_url: source.trim() || null,
+        ingredients: imported?.ingredients ?? toList(ingredients),
+        instructions: imported?.instructions ?? toList(instructions),
+        prep_time_minutes: imported ? imported.prep_time_minutes : toInt(prep),
+        cook_time_minutes: imported ? imported.cook_time_minutes : toInt(cook),
+        servings: imported ? imported.servings : toInt(servings),
+        source_url: (imported ? imported.source_url ?? "" : source).trim() || null,
         notes: notes.trim() || null,
         ...(image_path !== undefined ? { image_path } : {}),
       }
@@ -356,6 +422,34 @@ export default function RecipeFormPage() {
               Brought to: {linkedEvents.map((e) => e.title).join(", ")}
             </p>
           )
+        )}
+
+        {!editing && (
+          <div className="grid gap-3 border-b border-dashed border-border pb-7">
+            <FormField
+              id="rf-link"
+              label="Found it online?"
+              error={errors.link}
+              hint="Paste the link and we’ll copy down the title, ingredients and steps. Or skip this and write it out below."
+            >
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Input
+                  id="rf-link"
+                  type="url"
+                  inputMode="url"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  aria-invalid={!!errors.link}
+                  placeholder="https://"
+                  className="sm:flex-1"
+                />
+                <Button type="button" variant="outline" onClick={onImport} disabled={importing || saving || !link.trim()}>
+                  <LinkIcon weight="bold" /> {importing ? "Reading…" : "Fetch recipe"}
+                </Button>
+              </div>
+            </FormField>
+            <Annotation rotate={-1} className="text-lg">just add your name and save</Annotation>
+          </div>
         )}
 
         <div className="grid gap-5 sm:grid-cols-[1.4fr_1fr]">
