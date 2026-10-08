@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { CrownStamp } from "@/components/cookbook/ornaments"
 import { mediaUrl } from "@/lib/supabase"
 import type { RecipeWithEvents } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -15,6 +16,7 @@ const TILTS = [
 /** A recipe written out by hand on an index card. */
 export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; index?: number }) {
   const image = mediaUrl(recipe.image_path)
+  const won = recipe.dishes.some((d) => d.events?.winner_recipe_id === recipe.id)
 
   return (
     <Link
@@ -24,6 +26,7 @@ export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; in
         TILTS[index % TILTS.length]
       )}
     >
+      {won && <CrownStamp className="absolute -right-3 -bottom-4 z-10" />}
       {image && (
         <div className="relative m-3 mb-0 aspect-[4/3] overflow-hidden border border-border bg-muted">
           <img src={image} alt="" loading="lazy" className="size-full object-cover sepia-[0.15]" />

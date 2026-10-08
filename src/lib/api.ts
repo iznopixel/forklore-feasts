@@ -70,6 +70,11 @@ export const deleteEvent = async (id: string) => {
   await call(`/api/events/${id}`, { method: "DELETE" })
 }
 
+/** Crowns a recipe as the event's winner; pass null to take the crown back. */
+export const setEventWinner = async (eventId: string, recipeId: string | null) => {
+  await call(`/api/events/${eventId}/winner`, { method: "PUT", json: { recipe_id: recipeId } })
+}
+
 /* ------------------------------ Dishes ------------------------------ */
 
 export const createDish = (input: DishInput) => call<Dish>("/api/dishes", { method: "POST", json: input })

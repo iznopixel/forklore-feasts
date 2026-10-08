@@ -9,13 +9,15 @@ import {
   CalendarBlankIcon,
   ClockIcon,
   CookingPotIcon,
+  CrownSimpleIcon,
   LinkSimpleIcon,
   PencilSimpleIcon,
   TrashIcon,
   UserIcon,
   UsersIcon,
 } from "@phosphor-icons/react"
-import { Annotation } from "@/components/cookbook/ornaments"
+import { Annotation, CrownStamp } from "@/components/cookbook/ornaments"
+import { cn } from "@/lib/utils"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import {
   AlertDialog,
@@ -64,6 +66,7 @@ export default function RecipeDetailPage() {
     .map((d) => d.events)
     .filter((e): e is NonNullable<typeof e> => Boolean(e))
     .filter((e, i, arr) => arr.findIndex((x) => x.id === e.id) === i)
+  const wonEvents = events.filter((e) => e.winner_recipe_id === recipe.id)
   const facts = [
     { icon: ClockIcon, label: "Prep", value: minutesLabel(recipe.prep_time_minutes) },
     { icon: CookingPotIcon, label: "Cook", value: minutesLabel(recipe.cook_time_minutes) },
@@ -90,6 +93,7 @@ export default function RecipeDetailPage() {
       {/* Recipe card */}
       <div className="index-card relative mt-6 p-6 sm:p-10" style={{ backgroundImage: "none" }}>
         <div className="tape -top-3 left-10 -rotate-3" aria-hidden="true" />
+        {wonEvents.length > 0 && <CrownStamp className="absolute -right-3 -bottom-5 z-10 size-24 sm:-right-5" />}
         <header className="grid gap-8 md:grid-cols-[1fr_20rem]">
           <div>
             <p className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-moss uppercase">
@@ -108,9 +112,17 @@ export default function RecipeDetailPage() {
                   <li key={e.id}>
                     <Link
                       href={`/events/${e.slug}`}
-                      className="inline-flex items-center gap-1.5 border border-foreground/40 bg-paper px-2.5 py-1 text-sm font-semibold hover:bg-muted"
+                      className={cn(
+                        "inline-flex items-center gap-1.5 border border-foreground/40 bg-paper px-2.5 py-1 text-sm font-semibold hover:bg-muted",
+                        e.winner_recipe_id === recipe.id && "border-tomato bg-tomato/10 text-tomato"
+                      )}
                     >
-                      <CalendarBlankIcon weight="fill" className="size-4 text-wine" />
+                      {e.winner_recipe_id === recipe.id ? (
+                        <CrownSimpleIcon weight="fill" className="size-4" />
+                      ) : (
+                        <CalendarBlankIcon weight="fill" className="size-4 text-wine" />
+                      )}
+                      {e.winner_recipe_id === recipe.id && "Winner of "}
                       {e.title} · {shortDate(e.starts_at)}
                     </Link>
                   </li>

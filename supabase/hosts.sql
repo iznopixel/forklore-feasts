@@ -89,6 +89,10 @@ create policy "hosts delete own events" on public.events
   for delete to authenticated
   using (public.is_host() and host_user_id = auth.uid());
 
+-- 5. The winning recipe of an event, crowned by its host (existing update policy covers who can set it).
+alter table public.events
+  add column if not exists winner_recipe_id uuid references public.recipes (id) on delete set null;
+
 -- Admin: review requests and approve (run as admin in the SQL editor)
 -- select email, name, created_at from public.hosts where status = 'pending';
 -- update public.hosts set status = 'approved' where email = 'someone@example.com';

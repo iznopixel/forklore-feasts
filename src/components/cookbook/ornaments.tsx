@@ -1,7 +1,7 @@
 "use client"
 
 import type { ComponentProps, ReactNode } from "react"
-import { StarIcon } from "@phosphor-icons/react"
+import { CrownSimpleIcon, StarIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 /** Little four-point sparkle, like a printer's dingbat. */
@@ -103,6 +103,23 @@ export function Stamp({
       style={{ transform: `rotate(${rotate}deg)` }}
     >
       {children}
+    </div>
+  )
+}
+
+/** Solid ink stamp pressed onto a card to mark an event's winning recipe. */
+export function CrownStamp({ className, label = "Winner" }: { className?: string; label?: string }) {
+  return (
+    <div
+      role="img"
+      aria-label={`${label} of the gathering`}
+      className={cn(
+        "flex size-[4.5rem] rotate-[10deg] flex-col items-center justify-center rounded-full bg-tomato text-background shadow-[0_2px_5px_rgb(60_40_20/0.35)] outline-[1.5px] -outline-offset-[5px] outline-background/70",
+        className
+      )}
+    >
+      <CrownSimpleIcon weight="fill" aria-hidden="true" className="size-7" />
+      <span className="mt-0.5 text-[0.55rem] leading-none font-bold tracking-[0.22em] uppercase">{label}</span>
     </div>
   )
 }

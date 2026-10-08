@@ -83,3 +83,17 @@ export async function requireHost(req: Request, sb: SupabaseClient) {
   if (data !== true) throw new ApiError(403, "This account isn’t set up as a host yet.")
   return user
 }
+
+type Result<T> = { data: T; error: { message: string; code?: string } | null }
+
+/**
+ * Recipe queries embed each event's `winner_recipe_id`. Until supabase/hosts.sql has added that
+ * column, retry without it so recipes keep loading (they just show no crown).
+ */
+export async function withWinnerColumn<T>(run: (eventColumns: string) => PromiseLike<Result<T>>): Promise<Result<T>> {
+  const result = await run("id, title, slug, starts_at, winner_recipe_id")
+  if (result.error && /winner_recipe_id/.test(result.error.message)) {
+    return run("id, title, slug, starts_at")
+  }
+  return result
+}

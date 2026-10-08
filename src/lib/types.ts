@@ -9,6 +9,8 @@ export interface Event {
   host_user_id: string | null
   /** false = unlisted: reachable by link, hidden from listings */
   is_public: boolean
+  /** Recipe the host crowned as the winner of this gathering */
+  winner_recipe_id: string | null
   created_at: string
   updated_at: string
 }
@@ -56,7 +58,7 @@ export type EventSummary = Event & {
   dishes: Pick<Dish, "id" | "recipe_id">[]
 }
 
-export type RecipeEventRef = Pick<Event, "id" | "title" | "slug" | "starts_at">
+export type RecipeEventRef = Pick<Event, "id" | "title" | "slug" | "starts_at" | "winner_recipe_id">
 export type RecipeWithEvents = Recipe & {
   dishes: { id: string; event_id: string; events: RecipeEventRef | null }[]
 }

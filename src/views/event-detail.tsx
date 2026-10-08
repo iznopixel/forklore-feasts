@@ -7,12 +7,13 @@ import { toast } from "sonner"
 import {
   ArrowLeftIcon,
   BookOpenTextIcon,
+  CrownSimpleIcon,
   PencilSimpleIcon,
   PlusIcon,
   TrashIcon,
 } from "@phosphor-icons/react"
 import { DishDialog } from "@/components/cookbook/dish-dialog"
-import { Annotation, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
+import { Annotation, CrownStamp, SectionHeader, Squiggle } from "@/components/cookbook/ornaments"
 import { EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import {
   AlertDialog,
@@ -26,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { deleteDish, fetchEventBySlug } from "@/lib/api"
+import { deleteDish, fetchEventBySlug, setEventWinner } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import { distinctRecipeCount, isUpcoming, longDate, monthDay, timeOfDay } from "@/lib/format"
 import { categoryIcon, posterStyle } from "@/lib/taxonomy"
@@ -66,6 +67,18 @@ export default function EventDetailPage() {
   const d = monthDay(event.starts_at)
   const cover = mediaUrl(event.cover_image_path)
   const recipeCount = distinctRecipeCount(event.dishes)
+
+  const isHost = !!userId && event.host_user_id === userId
+
+  async function crown(recipeId: string | null) {
+    try {
+      await setEventWinner(event!.id, recipeId)
+      toast.success(recipeId ? "Crowned. Congratulations to the cook." : "Crown taken back.")
+      reload()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn’t update the winner.")
+    }
+  }
 
   const openAdd = () => setDishDialog({ open: true, dish: null })
 
@@ -200,6 +213,9 @@ export default function EventDetailPage() {
                   dish={dish}
                   eventSlug={event.slug}
                   mine={!!userId && dish.owner_user_id === userId}
+                  winner={!!dish.recipe_id && dish.recipe_id === event.winner_recipe_id}
+                  canCrown={isHost && !!dish.recipe_id}
+                  onCrown={() => void crown(dish.recipe_id === event.winner_recipe_id ? null : dish.recipe_id)}
                   onEdit={() => setDishDialog({ open: true, dish })}
                   onDelete={() => setToDelete(dish)}
                 />
@@ -244,12 +260,18 @@ function DishItem({
   dish,
   eventSlug,
   mine,
+  winner,
+  canCrown,
+  onCrown,
   onEdit,
   onDelete,
 }: {
   dish: DishWithRecipe
   eventSlug: string
   mine: boolean
+  winner: boolean
+  canCrown: boolean
+  onCrown: () => void
   onEdit: () => void
   onDelete: () => void
 }) {
@@ -257,6 +279,7 @@ function DishItem({
   const recipe = dish.recipes
   return (
     <li className={cn("paper relative flex gap-4 p-5", mine && "border-l-[5px] border-l-moss")}>
+      {winner && <CrownStamp className="absolute -right-3 -bottom-4 z-10" />}
       <div className="grid size-10 shrink-0 place-items-center rounded-full border border-tomato/50 text-tomato">
         <Icon weight="regular" className="size-5" />
       </div>
@@ -285,6 +308,11 @@ function DishItem({
             </Link>
           ) : (
             <span className="font-hand text-xl text-muted-foreground">recipe not written down yet</span>
+          )}
+          {canCrown && (
+            <Button variant={winner ? "default" : "outline"} size="sm" onClick={onCrown}>
+              <CrownSimpleIcon weight={winner ? "fill" : "bold"} /> {winner ? "Take back the crown" : "Crown the winner"}
+            </Button>
           )}
           {mine && (
             <>
