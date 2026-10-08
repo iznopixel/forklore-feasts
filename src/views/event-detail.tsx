@@ -279,7 +279,7 @@ function DishItem({
   const recipe = dish.recipes
   return (
     <li className={cn("paper relative flex gap-4 p-5", mine && "border-l-[5px] border-l-moss")}>
-      {winner && <CrownStamp className="absolute -top-4 -right-3 z-10" />}
+      {winner && <CrownStamp className="absolute -right-3 -bottom-4 z-10" />}
       <div className="grid size-10 shrink-0 place-items-center rounded-full border border-tomato/50 text-tomato">
         <Icon weight="regular" className="size-5" />
       </div>

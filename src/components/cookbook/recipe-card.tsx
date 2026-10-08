@@ -26,7 +26,7 @@ export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; in
         TILTS[index % TILTS.length]
       )}
     >
-      {won && <CrownStamp className="absolute -top-4 -right-3 z-10" />}
+      {won && <CrownStamp className="absolute -right-3 -bottom-4 z-10" />}
       {image && (
         <div className="relative m-3 mb-0 aspect-[4/3] overflow-hidden border border-border bg-muted">
           <img src={image} alt="" loading="lazy" className="size-full object-cover sepia-[0.15]" />
