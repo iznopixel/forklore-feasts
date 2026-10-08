@@ -127,7 +127,7 @@ export const deleteRecipe = async (id: string) => {
 export type ImportedRecipe = Pick<
   RecipeInput,
   "name" | "description" | "ingredients" | "instructions" | "prep_time_minutes" | "cook_time_minutes" | "servings" | "source_url"
->
+> & { /** Storage path of the photo copied from the original page. */ image_path: string | null }
 
 /** Reads a recipe from a web page; returns a draft without saving anything. */
 export const importRecipe = (url: string) =>

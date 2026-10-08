@@ -97,6 +97,7 @@ export default function RecipeFormPage() {
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [keepImage, setKeepImage] = useState(true)
+  const [importedImage, setImportedImage] = useState<string | null>(null)
   const [link, setLink] = useState("")
   const [importing, setImporting] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
@@ -182,7 +183,7 @@ export default function RecipeFormPage() {
   )
 
   const existingImage = editing && keepImage ? mediaUrl(existing.data?.image_path) : null
-  const shownImage = preview ?? existingImage
+  const shownImage = preview ?? existingImage ?? (!file ? mediaUrl(importedImage) : null)
 
   const dietary = useMemo(() => inferDietaryTags(toList(ingredients)), [ingredients])
 
@@ -203,6 +204,7 @@ export default function RecipeFormPage() {
     setCook(r.cook_time_minutes?.toString() ?? "")
     setServings(r.servings?.toString() ?? "")
     setSource(r.source_url ?? "")
+    setImportedImage(r.image_path)
   }
 
   function linkError(): string | undefined {
@@ -288,6 +290,7 @@ export default function RecipeFormPage() {
 
       let image_path: string | null | undefined = undefined
       if (file) image_path = await uploadImage(file)
+      else if (!editing && (imported?.image_path ?? importedImage)) image_path = imported?.image_path ?? importedImage
       else if (editing && !keepImage) image_path = null
 
       const input: RecipeInput = {
@@ -534,6 +537,7 @@ export default function RecipeFormPage() {
                   onClick={() => {
                     setFile(null)
                     setKeepImage(false)
+                    setImportedImage(null)
                     if (fileRef.current) fileRef.current.value = ""
                   }}
                   className="absolute -top-2 -right-2 grid size-7 place-items-center rounded-full border border-wine bg-paper text-wine"

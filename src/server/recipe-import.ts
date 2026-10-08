@@ -12,6 +12,8 @@ export interface ImportedRecipe {
   cook_time_minutes: number | null
   servings: number | null
   source_url: string
+  /** Absolute URL of the recipe's photo on the original site, if it has one. */
+  image_url: string | null
 }
 
 const MAX_BYTES = 3 * 1024 * 1024
@@ -51,16 +53,16 @@ async function assertPublicUrl(raw: string): Promise<URL> {
   return url
 }
 
-async function fetchHtml(raw: string): Promise<{ html: string; finalUrl: string }> {
+async function safeFetch(
+  raw: string,
+  { accept, maxBytes, truncate }: { accept: string; maxBytes: number; truncate: boolean }
+): Promise<{ bytes: Buffer; type: string; finalUrl: string }> {
   let url = await assertPublicUrl(raw)
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
     const res = await fetch(url, {
       redirect: "manual",
       signal: AbortSignal.timeout(10_000),
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; ForkloreFeasts/1.0; recipe importer)",
-        Accept: "text/html,application/xhtml+xml",
-      },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; ForkloreFeasts/1.0; recipe importer)", Accept: accept },
     }).catch(() => {
       throw new ApiError(502, "That page didn’t answer. Try again, or paste the recipe in by hand.")
     })
@@ -71,7 +73,6 @@ async function fetchHtml(raw: string): Promise<{ html: string; finalUrl: string 
     }
     if (!res.ok) throw new ApiError(502, `That site said no (${res.status}). Paste the recipe in by hand instead.`)
     const type = res.headers.get("content-type") ?? ""
-    if (type && !/html|xml/i.test(type)) throw new ApiError(415, "That link isn’t a web page.")
 
     const reader = res.body?.getReader()
     if (!reader) throw new ApiError(502, "That page came back empty.")
@@ -81,15 +82,39 @@ async function fetchHtml(raw: string): Promise<{ html: string; finalUrl: string 
       const { done, value } = await reader.read()
       if (done) break
       total += value.length
-      if (total > MAX_BYTES) {
+      if (total > maxBytes) {
         await reader.cancel()
-        break
+        if (truncate) break
+        throw new ApiError(413, "That file is too big.")
       }
       chunks.push(value)
     }
-    return { html: Buffer.concat(chunks).toString("utf8"), finalUrl: url.toString() }
+    return { bytes: Buffer.concat(chunks), type, finalUrl: url.toString() }
   }
   throw new ApiError(502, "That link redirected too many times.")
+}
+
+async function fetchHtml(raw: string): Promise<{ html: string; finalUrl: string }> {
+  const { bytes, type, finalUrl } = await safeFetch(raw, {
+    accept: "text/html,application/xhtml+xml",
+    maxBytes: MAX_BYTES,
+    truncate: true,
+  })
+  if (type && !/html|xml/i.test(type)) throw new ApiError(415, "That link isn’t a web page.")
+  return { html: bytes.toString("utf8"), finalUrl }
+}
+
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+
+/** Downloads the recipe photo. Returns null when it's missing, not an image, or too big. */
+export async function fetchRecipeImage(url: string): Promise<{ bytes: Buffer; type: string } | null> {
+  try {
+    const { bytes, type } = await safeFetch(url, { accept: "image/*", maxBytes: MAX_IMAGE_BYTES, truncate: false })
+    const mime = type.split(";")[0].trim().toLowerCase()
+    return /^image\/(jpeg|png|webp|gif|avif)$/.test(mime) && bytes.length > 0 ? { bytes, type: mime } : null
+  } catch {
+    return null
+  }
 }
 
 /* ------------------------------ Parsing ------------------------------ */
@@ -186,6 +211,20 @@ function metaContent(html: string, prop: string): string {
   return clean(/content=["']([^"']*)["']/i.exec(tag ?? "")?.[1])
 }
 
+function imageUrl(v: unknown, base: string): string | null {
+  for (const item of asArray(v)) {
+    const candidate = typeof item === "string" ? item : item && typeof item === "object" ? (item as Record<string, unknown>).url : null
+    if (typeof candidate === "string" && candidate.trim()) {
+      try {
+        return new URL(decode(candidate.trim()), base).toString()
+      } catch {
+        /* try the next one */
+      }
+    }
+  }
+  return null
+}
+
 export async function importRecipeFromUrl(raw: string): Promise<ImportedRecipe> {
   const { html, finalUrl } = await fetchHtml(raw)
   const r = extractJsonLd(html)
@@ -205,5 +244,6 @@ export async function importRecipeFromUrl(raw: string): Promise<ImportedRecipe> 
     cook_time_minutes: minutes(r.cookTime) ?? (r.prepTime ? null : minutes(r.totalTime)),
     servings: servingCount(r.recipeYield),
     source_url: finalUrl,
+    image_url: imageUrl(metaContent(html, "og:image"), finalUrl) ?? imageUrl(asArray(r.image).reverse(), finalUrl),
   }
 }
