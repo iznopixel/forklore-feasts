@@ -1,7 +1,7 @@
 import { ApiError, check, handle, ok, readJson, requireUser, supabaseFor } from "@/server/supabase"
 import { sanitizeRecipe } from "@/server/validate"
 
-const WITH_EVENTS = "dishes (id, event_id, events (id, title, slug, starts_at))"
+const WITH_EVENTS = "dishes (id, event_id, events (id, title, slug, starts_at, winner_recipe_id))"
 
 export const GET = handle(async (req: Request) => {
   const sb = supabaseFor(req)
@@ -10,7 +10,7 @@ export const GET = handle(async (req: Request) => {
   // `!inner` makes the event filter apply to the parent recipe rows
   let q = sb
     .from("recipes")
-    .select(eventId ? "*, dishes!inner (id, event_id, events (id, title, slug, starts_at))" : `*, ${WITH_EVENTS}`)
+    .select(eventId ? "*, dishes!inner (id, event_id, events (id, title, slug, starts_at, winner_recipe_id))" : `*, ${WITH_EVENTS}`)
   if (eventId) q = q.eq("dishes.event_id", eventId)
   if (p.get("category")) q = q.eq("category", p.get("category")!)
   if (p.get("tag")) q = q.contains("tags", [p.get("tag")!])

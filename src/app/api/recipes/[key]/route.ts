@@ -9,7 +9,7 @@ export const GET = handle(async (req: Request, ctx: Ctx) => {
   const recipe = check(
     await supabaseFor(req)
       .from("recipes")
-      .select("*, dishes (id, event_id, events (id, title, slug, starts_at))")
+      .select("*, dishes (id, event_id, events (id, title, slug, starts_at, winner_recipe_id))")
       .eq("slug", key)
       .maybeSingle()
   )
