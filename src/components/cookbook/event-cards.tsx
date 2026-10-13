@@ -55,9 +55,13 @@ export function PosterCard({
       <article className={cn("relative", className)}>
         <div className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
         <figure className="border border-border bg-[#fbf3e3] p-3 text-ink shadow-[5px_5px_0_rgb(44_48_37/0.18)] sm:p-4">
-          <Link href={`/events/${event.slug}`} className="block outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+          {captionless ? (
+            <Link href={`/events/${event.slug}`} className="block outline-none after:absolute after:inset-0 focus-visible:ring-3 focus-visible:ring-ring/50">
+              <img src={cover} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
+            </Link>
+          ) : (
             <img src={cover} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
-          </Link>
+          )}
           {!captionless && (
           <figcaption className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 px-1 pt-4 pb-1">
             <div className="min-w-0">
@@ -70,7 +74,7 @@ export function PosterCard({
               </p>
               <CountLine event={event} className="mt-1 text-moss" />
             </div>
-            <Link href={`/events/${event.slug}`} className={cn(buttonVariants({ size: "lg" }))}>
+            <Link href={`/events/${event.slug}`} className={cn(buttonVariants({ size: "lg" }), "after:absolute after:inset-0")}>
               {featured ? "RSVP & see the menu" : "See details"}
               <ArrowRightIcon weight="bold" />
             </Link>
@@ -122,7 +126,7 @@ export function PosterCard({
               href={`/events/${event.slug}`}
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "border-current bg-(--poster-ink) text-(--poster-bg) shadow-[3px_3px_0_var(--poster-accent)] hover:bg-(--poster-ink)/90"
+                "after:absolute after:inset-0 border-current bg-(--poster-ink) text-(--poster-bg) shadow-[3px_3px_0_var(--poster-accent)] hover:bg-(--poster-ink)/90"
               )}
             >
               {featured ? "RSVP & see the menu" : "See details"}

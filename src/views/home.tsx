@@ -26,7 +26,7 @@ function LastGatheringPhoto({ event }: { event: EventSummary }) {
     <div className="relative mx-auto w-full max-w-sm lg:max-w-none">
       <div className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
       <figure className="border border-border bg-[#fbf3e3] p-3 text-ink shadow-[5px_5px_0_rgb(44_48_37/0.18)] motion-safe:-rotate-[1deg]">
-        <Link href={`/events/${event.slug}`} className="block outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+        <Link href={`/events/${event.slug}`} className="block outline-none after:absolute after:inset-0 focus-visible:ring-3 focus-visible:ring-ring/50">
           {cover ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={cover} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
