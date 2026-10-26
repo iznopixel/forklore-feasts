@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import {
   ArrowLeftIcon,
   BookOpenTextIcon,
+  CalendarPlusIcon,
   CrownSimpleIcon,
   PencilSimpleIcon,
   PlusIcon,
@@ -29,6 +30,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { deleteDish, fetchEventBySlug, setEventWinner } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
+import { downloadEventIcs } from "@/lib/calendar"
 import { distinctRecipeCount, isUpcoming, longDate, monthDay, timeOfDay } from "@/lib/format"
 import { categoryIcon, posterStyle } from "@/lib/taxonomy"
 import { mediaUrl } from "@/lib/supabase"
@@ -132,6 +134,11 @@ export default function EventDetailPage() {
                 <Button size="lg" onClick={openAdd} className="btn-letterpress h-11 px-6 text-base">
                   <PlusIcon weight="bold" /> {upcoming ? "Add what you’re bringing" : "Add what you brought"}
                 </Button>
+                {upcoming && (
+                  <Button variant="outline" size="lg" onClick={() => downloadEventIcs(event)} className="h-11 px-6 text-base">
+                    <CalendarPlusIcon weight="bold" /> Save to calendar
+                  </Button>
+                )}
                 <Annotation className="text-tomato" rotate={-3}>{style.scrawl}</Annotation>
               </div>
             </div>
