@@ -56,7 +56,8 @@ export function eventIcs(event: Pick<Event, "id" | "title" | "theme" | "descript
 
 /** Hands the browser an .ics file: phones offer their calendar app, desktops download it. */
 export function downloadEventIcs(event: Pick<Event, "id" | "title" | "slug" | "theme" | "description" | "starts_at">) {
-  const blob = new Blob([eventIcs(event, window.location.href)], { type: "text/calendar;charset=utf-8" })
+  const pageUrl = new URL(`/events/${event.slug}`, window.location.origin).href
+  const blob = new Blob([eventIcs(event, pageUrl)], { type: "text/calendar;charset=utf-8" })
   const href = URL.createObjectURL(blob)
   const a = document.createElement("a")
   a.href = href

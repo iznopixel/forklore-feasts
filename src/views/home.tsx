@@ -1,13 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRightIcon, HandHeartIcon } from "@phosphor-icons/react"
+import { ArrowRightIcon, CalendarPlusIcon, HandHeartIcon } from "@phosphor-icons/react"
 import { Annotation, SectionHeader } from "@/components/cookbook/ornaments"
 import { PosterCard } from "@/components/cookbook/event-cards"
 import { RecipeCard } from "@/components/cookbook/recipe-card"
 import { CardSkeletons, EmptyNote, ErrorNote } from "@/components/cookbook/states"
 import { buttonVariants } from "@/components/ui/button"
 import { fetchEvents, fetchRecipes } from "@/lib/api"
+import { downloadEventIcs } from "@/lib/calendar"
 import { isUpcoming, longDate } from "@/lib/format"
 import { mediaUrl } from "@/lib/supabase"
 import type { EventSummary } from "@/lib/types"
@@ -132,9 +133,9 @@ export default function HomePage() {
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 font-heading text-lg font-bold text-tomato">
               {featured && (
-                <Link href={`/events/${featured.slug}`} className="inline-flex items-center gap-1 hover:underline">
-                  Add yours <ArrowRightIcon weight="bold" />
-                </Link>
+                <button type="button" onClick={() => downloadEventIcs(featured)} className="inline-flex cursor-pointer items-center gap-1 hover:underline">
+                  Add to calendar <CalendarPlusIcon weight="bold" />
+                </button>
               )}
               <Link href="/events" className="inline-flex items-center gap-1 hover:underline">
                 All gatherings <ArrowRightIcon weight="bold" />
