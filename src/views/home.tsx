@@ -10,13 +10,13 @@ import { buttonVariants } from "@/components/ui/button"
 import { fetchEvents, fetchRecipes } from "@/lib/api"
 import { downloadEventIcs } from "@/lib/calendar"
 import { isUpcoming, longDate } from "@/lib/format"
-import { mediaUrl } from "@/lib/supabase"
+import { photoProps } from "@/lib/supabase"
 import type { EventSummary } from "@/lib/types"
 import { useAsync } from "@/lib/use-async"
 
 /** The last evening's invitation, taped up like a snapshot. */
 function LastGatheringPhoto({ event }: { event: EventSummary }) {
-  const cover = mediaUrl(event.cover_image_path)
+  const photo = photoProps(event.cover_image_path, "(min-width: 1024px) 22rem, 90vw")
   const caption = (
     <figcaption className="px-1 pt-3 pb-1">
       <h3 className="font-heading text-2xl leading-tight font-bold">{event.title}</h3>
@@ -28,9 +28,9 @@ function LastGatheringPhoto({ event }: { event: EventSummary }) {
       <div className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
       <figure className="border border-border bg-[#fbf3e3] p-3 text-ink shadow-[5px_5px_0_rgb(44_48_37/0.18)] motion-safe:-rotate-[1deg]">
         <Link href={`/events/${event.slug}`} className="block outline-none after:absolute after:inset-0 focus-visible:ring-3 focus-visible:ring-ring/50">
-          {cover ? (
+          {photo ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={cover} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
+            <img {...photo} loading="lazy" alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
           ) : (
             <div className="grain flex aspect-square w-full items-center justify-center bg-muted p-6 text-center">
               <span className="display text-4xl text-wine">{event.title}</span>

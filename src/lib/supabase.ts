@@ -14,6 +14,16 @@ export const supabase = createClient(url || "http://localhost:54321", key || "mi
 
 export const MEDIA_BUCKET = "forklore-media"
 
+const IMAGE_WIDTHS = [384, 640, 828, 1080] as const
+
+/** Resized, WebP-converted `src` / `srcSet` / `sizes` for a stored photo, via the Next image optimizer. */
+export function photoProps(path: string | null | undefined, sizes: string) {
+  const original = mediaUrl(path)
+  if (!original) return null
+  const at = (w: number) => `/_next/image?url=${encodeURIComponent(original)}&w=${w}&q=75`
+  return { src: at(640), srcSet: IMAGE_WIDTHS.map((w) => `${at(w)} ${w}w`).join(", "), sizes }
+}
+
 /** Public URL for an object path stored in `cover_image_path` / `image_path`. */
 export function mediaUrl(path?: string | null): string | null {
   if (!path) return null

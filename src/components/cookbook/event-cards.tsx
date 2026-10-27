@@ -6,7 +6,7 @@ import { Annotation, Flourish } from "@/components/cookbook/ornaments"
 import { PosterSurface } from "@/components/cookbook/poster"
 import { buttonVariants } from "@/components/ui/button"
 import { distinctRecipeCount, longDate, monthDay, timeOfDay } from "@/lib/format"
-import { mediaUrl } from "@/lib/supabase"
+import { mediaUrl, photoProps } from "@/lib/supabase"
 import { posterStyle } from "@/lib/taxonomy"
 import type { EventSummary } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -49,7 +49,8 @@ export function PosterCard({
   const d = monthDay(event.starts_at)
   const style = posterStyle(event)
   const cover = mediaUrl(event.cover_image_path)
-  if (cover) {
+  const photo = photoProps(event.cover_image_path, "(min-width: 1024px) 26rem, 90vw")
+  if (cover && photo) {
     // The cover is a square invitation that already carries the details, so it leads; the text below is just a caption.
     return (
       <article className={cn("relative", className)}>
@@ -57,10 +58,10 @@ export function PosterCard({
         <figure className="border border-border bg-[#fbf3e3] p-3 text-ink shadow-[5px_5px_0_rgb(44_48_37/0.18)] sm:p-4">
           {captionless ? (
             <Link href={`/events/${event.slug}`} className="block outline-none after:absolute after:inset-0 focus-visible:ring-3 focus-visible:ring-ring/50">
-              <img src={cover} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
+              <img {...photo} fetchPriority={featured ? "high" : undefined} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
             </Link>
           ) : (
-            <img src={cover} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
+            <img {...photo} alt={`${event.title}${event.theme ? `: ${event.theme}` : ""}`} className="aspect-square w-full object-cover" />
           )}
           {!captionless && (
           <figcaption className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 px-1 pt-4 pb-1">
@@ -146,6 +147,7 @@ export function StubCard({ event }: { event: EventSummary }) {
   const style = posterStyle(event)
   const Glyph = style.glyphs[0]
   const cover = mediaUrl(event.cover_image_path)
+  const photo = photoProps(event.cover_image_path, "12rem")
   return (
     <Link
       href={`/events/${event.slug}`}
@@ -156,7 +158,7 @@ export function StubCard({ event }: { event: EventSummary }) {
     >
       {cover ? (
         <div className="relative min-h-40 border-r-2 border-dashed border-border bg-[#fbf3e3]">
-          <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
+          <img {...photo!} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
         </div>
       ) : (
         <div

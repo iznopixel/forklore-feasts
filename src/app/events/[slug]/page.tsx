@@ -21,7 +21,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!event) return {}
 
   const description = [event.theme, event.description].filter(Boolean).join(" · ") || undefined
-  const image = mediaUrl(event.cover_image_path)
+  // Social apps choke on multi-megabyte posters, so previews get the resized copy from our own domain when we know it
+  const original = mediaUrl(event.cover_image_path)
+  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  const image =
+    original && host ? `https://${host}/_next/image?url=${encodeURIComponent(original)}&w=1200&q=75` : original
 
   return {
     title: event.title,

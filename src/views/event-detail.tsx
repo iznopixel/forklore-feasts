@@ -33,7 +33,7 @@ import { useAuth } from "@/lib/auth"
 import { downloadEventIcs } from "@/lib/calendar"
 import { distinctRecipeCount, isUpcoming, longDate, monthDay, timeOfDay } from "@/lib/format"
 import { categoryIcon, posterStyle } from "@/lib/taxonomy"
-import { mediaUrl } from "@/lib/supabase"
+import { photoProps } from "@/lib/supabase"
 import type { Dish, DishWithRecipe } from "@/lib/types"
 import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
@@ -67,7 +67,7 @@ export default function EventDetailPage() {
   const upcoming = isUpcoming(event.starts_at)
   const style = posterStyle(event)
   const d = monthDay(event.starts_at)
-  const cover = mediaUrl(event.cover_image_path)
+  const cover = photoProps(event.cover_image_path, "(min-width: 1024px) 24rem, 90vw")
   const recipeCount = distinctRecipeCount(event.dishes)
 
   const isHost = !!userId && event.host_user_id === userId
@@ -147,7 +147,7 @@ export default function EventDetailPage() {
               <div aria-hidden="true" className="absolute -inset-x-4 inset-y-6 -z-0 hidden rotate-[2deg] bg-moss/25 lg:block" />
               {cover ? (
                 <figure className="relative max-w-md rotate-[1.5deg] bg-[#fdf8ec] p-3 pb-10 text-ink shadow-[0_1px_2px_rgb(60_40_20/0.25),0_14px_28px_-8px_rgb(60_40_20/0.35)] lg:max-w-none">
-                  <img src={cover} alt={event.title} className="aspect-square w-full object-cover" />
+                  <img {...cover} fetchPriority="high" alt={event.title} className="aspect-square w-full object-cover" />
                   <figcaption className="font-hand absolute inset-x-0 bottom-2 text-center text-xl text-tomato">
                     {d.month} {d.day}
                   </figcaption>

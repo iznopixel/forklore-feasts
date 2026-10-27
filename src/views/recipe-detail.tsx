@@ -34,7 +34,7 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { deleteRecipe, fetchRecipeBySlug } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import { minutesLabel, shortDate } from "@/lib/format"
-import { mediaUrl } from "@/lib/supabase"
+import { photoProps } from "@/lib/supabase"
 import { categoryIcon } from "@/lib/taxonomy"
 import { useAsync } from "@/lib/use-async"
 
@@ -60,7 +60,7 @@ export default function RecipeDetailPage() {
   }
 
   const Icon = categoryIcon(recipe.category)
-  const image = mediaUrl(recipe.image_path)
+  const image = photoProps(recipe.image_path, "(min-width: 1024px) 28rem, 90vw")
   const mine = !!userId && recipe.owner_user_id === userId
   const events = recipe.dishes
     .map((d) => d.events)
@@ -133,7 +133,7 @@ export default function RecipeDetailPage() {
           </div>
           {image && (
             <figure className="rotate-[1.5deg] self-start bg-[#fffaf0] p-2 pb-7 shadow-[3px_3px_0_rgb(44_48_37/0.2)]">
-              <img src={image} alt={recipe.name} className="aspect-[4/3] w-full object-cover sepia-[0.15]" />
+              <img {...image} alt={recipe.name} className="aspect-[4/3] w-full object-cover sepia-[0.15]" />
               <figcaption className="font-hand mt-1 text-center text-xl text-muted-foreground">{recipe.name}</figcaption>
             </figure>
           )}
