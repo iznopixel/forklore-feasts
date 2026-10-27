@@ -12,11 +12,11 @@ import type {
 } from "@/lib/types"
 
 /** Calls our Next.js API, attaching the guest's access token so RLS knows who is asking. */
-async function call<T>(path: string, init: RequestInit & { json?: unknown } = {}): Promise<T> {
+async function call<T>(path: string, init: RequestInit & { json?: unknown; anon?: boolean } = {}): Promise<T> {
   const headers = new Headers(init.headers)
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = init.anon ? { data: { session: null } } : await supabase.auth.getSession()
   if (session) headers.set("Authorization", `Bearer ${session.access_token}`)
   let body = init.body
   if (init.json !== undefined) {
@@ -41,7 +41,8 @@ async function callOrNull<T>(path: string): Promise<T | null> {
 
 /* ------------------------------ Events ------------------------------ */
 
-export const fetchEvents = () => call<EventSummary[]>("/api/events")
+/** Public listing: no guest token, so Vercel can cache it for everyone. */
+export const fetchEvents = () => call<EventSummary[]>("/api/events", { anon: true })
 
 export const fetchMyEvents = () => call<EventSummary[]>("/api/events?mine=1")
 

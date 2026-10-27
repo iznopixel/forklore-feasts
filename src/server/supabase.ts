@@ -39,8 +39,8 @@ export async function requireUser(req: Request, sb: SupabaseClient) {
   return data.user
 }
 
-export function ok(data: unknown, status = 200) {
-  return NextResponse.json(data, { status, headers: { "Cache-Control": "no-store" } })
+export function ok(data: unknown, status = 200, cacheControl = "no-store") {
+  return NextResponse.json(data, { status, headers: { "Cache-Control": cacheControl } })
 }
 
 /** Wraps a handler so thrown ApiErrors / Supabase errors become JSON responses. */

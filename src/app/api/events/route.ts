@@ -9,13 +9,15 @@ import { sanitizeEvent } from "@/server/validate"
 export const GET = handle(async (req: Request) => {
   const sb = supabaseFor(req)
   let q = sb.from("events").select("*, dishes (id, recipe_id)").order("starts_at", { ascending: true })
-  if (new URL(req.url).searchParams.get("mine") === "1") {
+  const mine = new URL(req.url).searchParams.get("mine") === "1"
+  if (mine) {
     const user = await requireUser(req, sb)
     q = q.eq("host_user_id", user.id)
   } else {
     q = q.eq("is_public", true)
   }
-  return ok(check(await q))
+  // The public listing is the same for everyone, so the CDN can serve it for a minute instead of asking the database each time
+  return ok(check(await q), 200, mine ? "no-store" : "public, s-maxage=60, stale-while-revalidate=600")
 })
 
 /** Hosts only. host_user_id and slug are filled by the database. */
