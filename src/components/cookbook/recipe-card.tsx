@@ -36,7 +36,7 @@ export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; in
         <h3 className="font-hand text-[1.85rem] leading-[1.05] font-bold text-foreground group-hover:text-tomato">
           {recipe.name}
         </h3>
-        <p className="font-hand text-[1.2rem] leading-none font-bold text-wine">
+        <p className="font-hand text-[1.2rem] leading-none text-wine">
           prepared by {recipe.contributor_name}
         </p>
       </div>
