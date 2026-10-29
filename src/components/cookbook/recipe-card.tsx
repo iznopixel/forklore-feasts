@@ -33,10 +33,10 @@ export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; in
         </div>
       )}
       <div className="flex flex-1 flex-col gap-2 p-5 pt-4">
-        <h3 className="font-hand text-[2.1rem] leading-[1.05] text-foreground group-hover:text-tomato">
+        <h3 className="font-hand text-[1.85rem] leading-[1.05] font-bold text-foreground group-hover:text-tomato">
           {recipe.name}
         </h3>
-        <p className="font-hand text-[1.35rem] leading-none text-wine">
+        <p className="font-hand text-[1.2rem] leading-none text-wine">
           prepared by {recipe.contributor_name}
         </p>
       </div>

@@ -89,15 +89,15 @@ export default function HomePage() {
         <div className="absolute inset-0 flex items-end px-4 pb-8 sm:items-center sm:p-0 sm:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]">
           <div className="sm:max-w-[min(34rem,60vw)] lg:max-w-[min(34rem,46vw)]">
             <Annotation className="mb-3 block text-[1.6rem] text-[#f0c9a0] lg:mb-2" rotate={-3}>
-              ~ come hungry, stay awhile ~
+              Last Wednesday of the month
             </Annotation>
             <h1 className="display text-[clamp(3.25rem,14vw,6rem)] text-[#fbf3e3] lg:text-[clamp(3.5rem,6vw,5.5rem)]">
-              Forklore
+              It&apos;s a potluck
               <br />
-              <span className="text-[#f2b9a8]">Feasts</span>
+              <span className="text-[#f2b9a8]">party</span>
             </h1>
             <p className="mt-4 max-w-[34ch] font-heading text-xl leading-snug font-medium italic lg:max-w-[36ch] lg:text-[1.35rem]">
-              Find a recipe worth making, sign up to bring a dish to the next gathering, or host a table of your own.
+              Let&apos;s break bread together, friends! Sign up to bring a dish to the next event or share your recipe from the last.
             </p>
           </div>
         </div>
@@ -126,7 +126,6 @@ export default function HomePage() {
             )}
           </div>
           <div>
-            <Annotation className="mb-3 block" rotate={-2}>save your seat</Annotation>
             <h2 className="display text-[clamp(2.25rem,5vw,3.25rem)] text-wine">Next on the table</h2>
             <p className="mt-4 max-w-[42ch] text-lg text-muted-foreground">
               {featured ? <NextGatheringBlurb event={featured} /> : "Light the candles and set out the good bowls. The next invitation is on its way."}
@@ -149,7 +148,6 @@ export default function HomePage() {
       <section className="border-t border-border bg-sky">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <SectionHeader
-            kicker="remember when…"
             title="From our last gathering"
             action={
               <Link href="/recipes" className="inline-flex items-center gap-1 font-heading text-lg font-bold text-tomato hover:underline">
@@ -174,10 +172,10 @@ export default function HomePage() {
                 </div>
               ) : (
                 <EmptyNote
-                  title="No recipes were passed around"
-                  action={<Link href="/recipes/new" className={buttonVariants()}>Share a recipe</Link>}
+                  title="Nobody shared a recipe yet"
+                  action={<Link href="/recipes/new" className={buttonVariants()}>Share your recipe</Link>}
                 >
-                  Nothing written down from that evening yet. Share a favorite for the next one.
+                  Nothing written down from that evening yet. Share a favorite and start the recipe box.
                 </EmptyNote>
               )}
             </div>
