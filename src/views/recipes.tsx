@@ -151,7 +151,7 @@ export default function RecipesPage() {
             </span>
             <Annotation rotate={-2}>{activeCount > 0 ? "matching your search" : "and counting"}</Annotation>
           </p>
-          <div className={cn("grid gap-7 sm:grid-cols-2 lg:grid-cols-3", recipes.loading && "opacity-60")}>
+          <div className={cn("grid grid-cols-[minmax(0,1fr)] gap-7 sm:grid-cols-2 lg:grid-cols-3", recipes.loading && "opacity-60")}>
             {recipes.data.map((r, i) => (
               <RecipeCard key={r.id} recipe={r} index={i} />
             ))}
