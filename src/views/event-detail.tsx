@@ -65,6 +65,7 @@ export default function EventDetailPage() {
   }
 
   const upcoming = isUpcoming(event.starts_at)
+  const started = new Date(event.starts_at).getTime() <= Date.now()
   const style = posterStyle(event)
   const d = monthDay(event.starts_at)
   const cover = photoProps(event.cover_image_path, "(min-width: 1024px) 24rem, 90vw")
@@ -82,6 +83,7 @@ export default function EventDetailPage() {
     }
   }
 
+  const shareRecipeHref = `/recipes/new?event=${event.slug}`
   const openAdd = () => setDishDialog({ open: true, dish: null })
 
   async function confirmDelete() {
@@ -131,9 +133,15 @@ export default function EventDetailPage() {
               </dl>
 
               <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
-                <Button size="lg" onClick={openAdd} className="btn-letterpress h-11 px-6 text-base">
-                  <PlusIcon weight="bold" /> {upcoming ? "Add what you’re bringing" : "Add what you brought"}
-                </Button>
+                {started ? (
+                  <Link href={shareRecipeHref} className={cn(buttonVariants({ size: "lg" }), "btn-letterpress h-11 px-6 text-base")}>
+                    <PlusIcon weight="bold" /> Share your recipe
+                  </Link>
+                ) : (
+                  <Button size="lg" onClick={openAdd} className="btn-letterpress h-11 px-6 text-base">
+                    <PlusIcon weight="bold" /> Add what you’re bringing
+                  </Button>
+                )}
                 {upcoming && (
                   <Button variant="outline" size="lg" onClick={() => downloadEventIcs(event)} className="h-11 px-6 text-base">
                     <CalendarPlusIcon weight="bold" /> Save to calendar
@@ -199,9 +207,15 @@ export default function EventDetailPage() {
             kicker={upcoming ? "who’s bringing what" : "what we shared"}
             title="On the table"
             action={
-              <Button onClick={openAdd} className="btn-letterpress">
-                <PlusIcon weight="bold" /> {upcoming ? "Add what you’re bringing" : "Add what you brought"}
-              </Button>
+              started ? (
+                <Link href={shareRecipeHref} className={cn(buttonVariants(), "btn-letterpress")}>
+                  <PlusIcon weight="bold" /> Share your recipe
+                </Link>
+              ) : (
+                <Button onClick={openAdd} className="btn-letterpress">
+                  <PlusIcon weight="bold" /> Add what you’re bringing
+                </Button>
+              )
             }
           />
 
