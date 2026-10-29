@@ -159,11 +159,11 @@ export function Layout({ children }: { children: ReactNode }) {
           <Flourish className="mb-8 text-[#f5cfc4]" />
           <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
             <div>
-              <p className="display text-5xl text-[#f4eedc]">Come hungry.</p>
-              <p className="display text-5xl text-[#f5cfc4]">Bring something good.</p>
-              <Annotation className="mt-3 block text-[#f6e6a8]" rotate={-2}>
-                good food, good company, and recipes worth keeping
+              <Annotation className="mb-3 block text-[#f6e6a8]" rotate={-2}>
+                good folks, loaded forks.
               </Annotation>
+              <p className="display text-5xl text-[#f4eedc]">Last Wednesday</p>
+              <p className="display text-5xl text-[#f5cfc4]">of the month</p>
             </div>
             <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2 font-heading text-lg font-semibold">
               {NAV.map(({ to, label }) => (
@@ -174,7 +174,7 @@ export function Layout({ children }: { children: ReactNode }) {
             </nav>
           </div>
           <p className="mt-10 flex items-center gap-2 text-sm opacity-80">
-            Forklore Feasts · set the table, share the recipe
+            Forklore Feasts
           </p>
         </div>
       </footer>
