@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { CrownStamp } from "@/components/cookbook/ornaments"
 import { photoProps } from "@/lib/supabase"
+import { categoryIcon, posterStyle } from "@/lib/taxonomy"
 import type { RecipeWithEvents } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -12,6 +13,29 @@ const TILTS = [
   "motion-safe:-rotate-[0.3deg]",
   "motion-safe:rotate-[1deg]",
 ]
+
+/**
+ * Stands in for a photo when a card without one is stretched to match a taller neighbour in its row.
+ * The wrapper takes only the leftover height (zero when the card isn't stretched, so it costs no layout),
+ * and the picture appears only once there's enough room for it to read as a photo.
+ */
+function DishPlaceholder({ recipe }: { recipe: RecipeWithEvents }) {
+  const style = posterStyle({ slug: recipe.slug, title: recipe.name, theme: null })
+  const Glyph = categoryIcon(recipe.category)
+  return (
+    <div className="relative min-h-0 flex-1 [container-type:size]" aria-hidden="true">
+      <div
+        className="grain absolute inset-x-3 top-3 bottom-0 hidden flex-col items-center justify-center gap-2 overflow-hidden border border-border [@container(min-height:7rem)]:flex"
+        style={{ background: style.bg, color: style.ink }}
+      >
+        <Glyph weight="fill" className="size-14 opacity-80" />
+        {recipe.category && (
+          <span className="text-[0.65rem] font-bold tracking-widest uppercase opacity-80">{recipe.category}</span>
+        )}
+      </div>
+    </div>
+  )
+}
 
 /** A recipe written out by hand on an index card. */
 export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; index?: number }) {
@@ -32,7 +56,8 @@ export function RecipeCard({ recipe, index = 0 }: { recipe: RecipeWithEvents; in
           <img {...image} alt="" loading="lazy" className="size-full max-w-full object-cover sepia-[0.15]" />
         </div>
       )}
-      <div className="flex flex-1 flex-col gap-2 p-5 pt-4">
+      {!image && <DishPlaceholder recipe={recipe} />}
+      <div className="flex flex-col gap-2 p-5 pt-4">
         <h3 className="font-hand text-[1.85rem] leading-[1.05] font-bold text-foreground group-hover:text-tomato">
           {recipe.name}
         </h3>
