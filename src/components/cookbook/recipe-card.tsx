@@ -77,7 +77,12 @@ export function RecipeCard({
         <DishPlaceholder recipe={recipe} layout={layout} />
       )}
       <div className={cn("flex flex-col gap-2 p-5 pt-4", side && "min-w-0 flex-1 justify-center p-4")}>
-        <h3 className="font-hand text-[1.85rem] leading-[1.05] font-bold break-words text-foreground group-hover:text-tomato">
+        <h3
+          className={cn(
+            "font-hand leading-[1.05] font-bold break-words text-foreground group-hover:text-tomato",
+            side ? "text-[1.55rem]" : "text-[1.85rem]"
+          )}
+        >
           {recipe.name}
         </h3>
         <p className="font-hand text-[1.2rem] leading-none text-wine">
