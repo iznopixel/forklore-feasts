@@ -167,7 +167,7 @@ export default function HomePage() {
               ) : recipes.data && recipes.data.length > 0 ? (
                 <div className="grid gap-7 sm:grid-cols-2">
                   {recipes.data.map((r, i) => (
-                    <RecipeCard key={r.id} recipe={r} index={i} />
+                    <RecipeCard key={r.id} recipe={r} index={i} layout="side" />
                   ))}
                 </div>
               ) : (
