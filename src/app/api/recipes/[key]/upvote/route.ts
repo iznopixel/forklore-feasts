@@ -15,6 +15,7 @@ export const GET = handle(async (req: Request, ctx: Ctx) => {
   if (!user) return ok({ count: recipe.upvote_count, upvoted: false })
 
   const vote = check(await sb.from("recipe_upvotes").select("recipe_id").eq("recipe_id", key).eq("user_id", user.id).maybeSingle())
+  if (!recipe) throw new ApiError(404, "Recipe not found.")
   return ok({ count: recipe.upvote_count, upvoted: Boolean(vote) })
 })
 
@@ -26,6 +27,7 @@ export const PUT = handle(async (req: Request, ctx: Ctx) => {
   // Concurrent taps and retries are idempotent thanks to the composite primary key.
   if (error && error.code !== "23505") check({ data: null, error })
   const recipe = check(await sb.from("recipes").select("upvote_count").eq("id", key).single())
+  if (!recipe) throw new ApiError(404, "Recipe not found.")
   return ok({ count: recipe.upvote_count, upvoted: true })
 })
 
@@ -35,5 +37,6 @@ export const DELETE = handle(async (req: Request, ctx: Ctx) => {
   const user = await requireUser(req, sb)
   check(await sb.from("recipe_upvotes").delete().eq("recipe_id", key).eq("user_id", user.id))
   const recipe = check(await sb.from("recipes").select("upvote_count").eq("id", key).single())
+  if (!recipe) throw new ApiError(404, "Recipe not found.")
   return ok({ count: recipe.upvote_count, upvoted: false })
 })
