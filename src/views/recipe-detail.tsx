@@ -15,6 +15,7 @@ import {
   TrashIcon,
   UserIcon,
   UsersIcon,
+  ArrowFatUpIcon,
 } from "@phosphor-icons/react"
 import { Annotation, CrownStamp } from "@/components/cookbook/ornaments"
 import { cn } from "@/lib/utils"
@@ -31,7 +32,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { deleteRecipe, fetchRecipeBySlug } from "@/lib/api"
+import { deleteRecipe, fetchRecipeBySlug, fetchRecipeVote, setRecipeUpvote, type RecipeVote } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import { minutesLabel, shortDate } from "@/lib/format"
 import { photoProps } from "@/lib/supabase"
@@ -44,6 +45,31 @@ export default function RecipeDetailPage() {
   const { userId } = useAuth()
   const { data: recipe, error, loading, reload } = useAsync(() => fetchRecipeBySlug(slug), [slug])
   const [confirming, setConfirming] = useState(false)
+  const [votePending, setVotePending] = useState(false)
+  const [voteOverride, setVoteOverride] = useState<RecipeVote | null>(null)
+  const { data: initialVote, reload: reloadVote } = useAsync(
+    () => recipe ? fetchRecipeVote(recipe.id) : Promise.resolve({ count: 0, upvoted: false }),
+    [recipe?.id, userId]
+  )
+  const vote = voteOverride ?? initialVote
+
+  async function toggleVote() {
+    if (!recipe || votePending) return
+    if (!userId) {
+      toast.error("Your guest session isn't ready. Refresh the page to try again.")
+      return
+    }
+    setVotePending(true)
+    try {
+      const next = await setRecipeUpvote(recipe.id, !vote?.upvoted)
+      setVoteOverride(next)
+      reloadVote()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't update your vote.")
+    } finally {
+      setVotePending(false)
+    }
+  }
 
   if (loading && !recipe) {
     return <div className="mx-auto h-[32rem] max-w-4xl animate-pulse px-4 py-10" aria-busy="true"><div className="size-full bg-muted/60" /></div>
@@ -106,6 +132,19 @@ export default function RecipeDetailPage() {
                 from the kitchen of <strong className="font-heading text-xl">{recipe.contributor_name}</strong>
               </span>
             </p>
+            <div className="mt-5">
+              <Button
+                variant="outline"
+                onClick={() => void toggleVote()}
+                aria-pressed={Boolean(vote?.upvoted)}
+                aria-label={vote?.upvoted ? "Remove your upvote" : "Upvote this recipe"}
+                disabled={votePending || !userId}
+                className={cn("gap-2 border-wine/50 font-bold", vote?.upvoted && "border-tomato bg-tomato/10 text-tomato")}
+              >
+                <ArrowFatUpIcon weight={vote?.upvoted ? "fill" : "bold"} className="size-5" />
+                {vote?.count ?? recipe.upvote_count} {(vote?.count ?? recipe.upvote_count) === 1 ? "upvote" : "upvotes"}
+              </Button>
+            </div>
             {events.length > 0 && (
               <ul className="mt-3 flex flex-wrap gap-2">
                 {events.map((e) => (

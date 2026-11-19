@@ -32,6 +32,7 @@ export interface Recipe {
   source_url: string | null
   notes: string | null
   owner_user_id: string
+  upvote_count: number
   created_at: string
   updated_at: string
 }
