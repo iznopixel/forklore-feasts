@@ -9,7 +9,9 @@ export const GET = handle(async (req: Request, ctx: Ctx) => {
   const recipe = check(await sb.from("recipes").select("upvote_count").eq("id", key).maybeSingle())
   if (!recipe) throw new ApiError(404, "Recipe not found.")
 
-  const { data: { user } } = await sb.auth.getUser()
+  const token = req.headers.get("authorization")?.replace(/^Bearer\\s+/i, "")
+  if (!token) return ok({ count: recipe.upvote_count, upvoted: false })
+  const { data: { user } } = await sb.auth.getUser(token)
   if (!user) return ok({ count: recipe.upvote_count, upvoted: false })
 
   const vote = check(await sb.from("recipe_upvotes").select("recipe_id").eq("recipe_id", key).eq("user_id", user.id).maybeSingle())
