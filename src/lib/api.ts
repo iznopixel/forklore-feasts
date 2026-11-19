@@ -121,6 +121,14 @@ export const fetchRecipeFacets = () =>
 export const fetchRecipeBySlug = (slug: string) =>
   callOrNull<RecipeWithEvents>(`/api/recipes/${encodeURIComponent(slug)}`)
 
+export type RecipeVote = { count: number; upvoted: boolean }
+
+export const fetchRecipeVote = (id: string) =>
+  call<RecipeVote>(`/api/recipes/${id}/upvote`)
+
+export const setRecipeUpvote = (id: string, upvoted: boolean) =>
+  call<RecipeVote>(`/api/recipes/${id}/upvote`, { method: upvoted ? "PUT" : "DELETE" })
+
 export const createRecipe = (input: RecipeInput) => call<Recipe>("/api/recipes", { method: "POST", json: input })
 
 export const updateRecipe = (id: string, input: RecipeInput) =>
